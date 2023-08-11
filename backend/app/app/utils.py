@@ -3,7 +3,12 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Optional
 
+from email.message import EmailMessage
+import smtplib
+
+import mailtrap as mt
 import emails
+
 from emails.template import JinjaTemplate
 from jose import jwt
 
@@ -31,6 +36,48 @@ def send_email(
         smtp_options["password"] = settings.SMTP_PASSWORD
     response = message.send(to=email_to, render=environment, smtp=smtp_options)
     logging.info(f"send email result: {response}")
+
+
+def send_email_future(
+    email_to: str,
+    subject_template: str = "",
+    html_template: str = "",
+    environment: Dict[str, Any] = {},
+):
+    assert settings.EMAILS_ENABLED, "no provided configuration for email variables"
+    logging.info("Using the new code for Emails!")
+    smtp_host = settings.SMTP_HOST
+    smtp_port = settings.SMTP_PORT
+    smtp_user = settings.SMTP_USER
+    smtp_password = settings.SMTP_PASSWORD
+    smtp_from_email = settings.EMAILS_FROM_EMAIL
+    text_subtype = "html"
+
+    print("smtp_host", smtp_host)
+    print("smtp_port", smtp_port)
+    print("smtp_user", smtp_user)
+    print("smtppassword", smtp_password)
+    print("smtp_from_email", smtp_from_email)
+
+    message = EmailMessage()
+    message.set_content(JinjaTemplate(html_template))
+
+    try:
+        message["subject"] = JinjaTemplate(subject_template)
+        message["from"] = smtp_from_email
+        message["to"] = email_to
+
+        print(message)
+
+        with smtplib.SMTP(smtp_host, smtp_port) as server:
+            server.login(smtp_user, smtp_password)
+            server.sendmail(smtp_from_email, email_to, message)
+
+    except Exception as e:
+        logging.error(e)
+        logging.error("Email couldn't be sent!")
+
+    logging.info(f"Email Sent")
 
 
 def send_test_email(email_to: str) -> None:

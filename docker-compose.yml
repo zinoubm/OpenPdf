@@ -16,7 +16,6 @@ services:
       - .env
 
   backend:
-    image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
     depends_on:
       - db
     env_file:
@@ -31,6 +30,8 @@ services:
       dockerfile: backend.dockerfile
       args:
         INSTALL_DEV: ${INSTALL_DEV-false}
+    volumes:
+      - ./backend/app:/app
 
   frontend:
     build:

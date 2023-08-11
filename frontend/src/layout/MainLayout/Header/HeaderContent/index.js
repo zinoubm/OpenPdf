@@ -1,5 +1,6 @@
 // material-ui
 // import { Box, IconButton, Link, useMediaQuery } from '@mui/material';
+// import { useMediaQuery } from '@mui/material';
 import { Box, useMediaQuery } from '@mui/material';
 // import { GithubOutlined } from '@ant-design/icons';
 
@@ -17,7 +18,8 @@ const HeaderContent = () => {
   return (
     <>
       {/* {!matchesXs && <Search />} */}
-      {matchesXs && <Box sx={{ width: '100%', ml: 1 }} />}
+      {/* {matchesXs && <Box sx={{ width: '100%', ml: 1 }} />} */}
+      <Box sx={{ width: '100%', ml: 1 }} />
 
       {/* <IconButton
         component={Link}
@@ -32,6 +34,7 @@ const HeaderContent = () => {
       </IconButton> */}
 
       {/* <Notification /> */}
+      {!matchesXs && <button>Upload</button>}
       {!matchesXs && <Profile />}
       {matchesXs && <MobileSection />}
     </>

@@ -6,6 +6,9 @@ RUN pip install --no-cache-dir uvicorn[standard]==0.18.3
 RUN pip install --no-cache-dir gunicorn==20.1.0
 
 EXPOSE 8000
+EXPOSE 2525
+EXPOSE 465
+EXPOSE 587
 
 # Install Poetry
 RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry python3
