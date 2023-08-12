@@ -1,0 +1,18 @@
+<mjml>
+  <mj-body background-color="#fff">
+    <mj-section>
+      <mj-column>
+        <mj-divider border-color="#555"></mj-divider>
+        <mj-text font-size="20px" color="#555" font-family="helvetica">{{ project_name }} - Email Verification</mj-text>
+        <mj-text font-size="16px" color="#555">Welcome {{ username }} to OpenPdf, Please Verify that your email Is {{ email }}</mj-text>
+        <mj-text font-size="16px" color="#555">Verify your Email by clicking the button below:</mj-text>
+        <mj-button padding="50px 0px" href="{{ link }}">Verify Email</mj-button>
+        <mj-text font-size="16px" color="#555">Or open the following link:</mj-text>
+        <mj-text font-size="16px" color="#555"><a href="{{ link }}">{{ link }}</a></mj-text>
+        <mj-divider border-color="#555" border-width="2px" />
+        <mj-text font-size="14px" color="#555">The Verification link / button will expire in {{ valid_hours }} hours.</mj-text>
+        <mj-text font-size="14px" color="#555">If you didn't create an account at OpenPdf, you can disregard this email.</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
