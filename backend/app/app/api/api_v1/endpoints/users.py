@@ -10,6 +10,12 @@ from app.api import deps
 from app.core.config import settings
 from app.utils import send_new_account_email
 
+from app.utils import (
+    generate_email_verification_token,
+    verify_email_verification_token,
+    send_verification_email,
+)
+
 router = APIRouter()
 
 
@@ -110,7 +116,42 @@ def create_user_open(
         )
     user_in = schemas.UserCreate(password=password, email=email, full_name=full_name)
     user = crud.user.create(db, obj_in=user_in)
+    # generate verification token
+    # send verification email
+    password_reset_token = generate_email_verification_token(email=email)
+    send_verification_email(
+        email_to=user.email, email=email, token=password_reset_token
+    )
     return user
+
+
+@router.get("/verify", response_model=schemas.Msg)
+def verify_user(
+    token: str,
+    db: Session = Depends(deps.get_db),
+):
+    # verify the token and extract the user email
+    # if no email is present raise a token not valid error
+    # retrieve the user from the database
+    # if no user raise the apropriate exception
+    # if user not active raise apropriate exception
+    # set the is_verified field to True
+    email = verify_email_verification_token(token)
+    if not email:
+        raise HTTPException(status_code=400, detail="Invalid token")
+    user = crud.user.get_by_email(db, email=email)
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="The user with this username does not exist in the system.",
+        )
+    elif not crud.user.is_active(user):
+        raise HTTPException(status_code=400, detail="Inactive user")
+
+    user.is_verified = True
+    db.add(user)
+    db.commit()
+    return {"msg": "User Verified successfully"}
 
 
 @router.get("/{user_id}", response_model=schemas.User)
