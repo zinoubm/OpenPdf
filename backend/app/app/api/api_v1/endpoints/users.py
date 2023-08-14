@@ -19,6 +19,11 @@ from app.utils import (
 router = APIRouter()
 
 
+@router.get("/sanity")
+def sanity_check():
+    return {"status": "Working"}
+
+
 @router.get("/", response_model=List[schemas.User])
 def read_users(
     db: Session = Depends(deps.get_db),

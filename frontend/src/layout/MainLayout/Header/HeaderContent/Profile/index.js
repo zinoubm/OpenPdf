@@ -1,10 +1,15 @@
 import PropTypes from 'prop-types';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
+import useAuth from 'api/hooks/useAuth';
+import useCurrentUser from 'api/hooks/useCurrentUser';
+import { useSelector, useDispatch } from 'react-redux';
+
+import { activeUserEmail, activeUserFullName } from 'store/reducers/auth';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import {
-  Avatar,
+  // Avatar,
   Box,
   ButtonBase,
   CardContent,
@@ -14,20 +19,20 @@ import {
   Paper,
   Popper,
   Stack,
-  Tab,
-  Tabs,
+  // Tab,
+  // Tabs,
   Typography
 } from '@mui/material';
 
 // project import
 import MainCard from 'components/MainCard';
 import Transitions from 'components/@extended/Transitions';
-import ProfileTab from './ProfileTab';
-import SettingTab from './SettingTab';
+// import ProfileTab from './ProfileTab';
+// import SettingTab from './SettingTab';
 
 // assets
-import avatar1 from 'assets/images/users/avatar-1.png';
-import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+// import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import { LogoutOutlined } from '@ant-design/icons';
 
 // tab panel wrapper
 function TabPanel({ children, value, index, ...other }) {
@@ -44,20 +49,25 @@ TabPanel.propTypes = {
   value: PropTypes.any.isRequired
 };
 
-function a11yProps(index) {
-  return {
-    id: `profile-tab-${index}`,
-    'aria-controls': `profile-tabpanel-${index}`
-  };
-}
+// function a11yProps(index) {
+//   return {
+//     id: `profile-tab-${index}`,
+//     'aria-controls': `profile-tabpanel-${index}`
+//   };
+// }
 
 // ==============================|| HEADER CONTENT - PROFILE ||============================== //
 
 const Profile = () => {
   const theme = useTheme();
+  const { userFullName, userEmail } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+
+  const { deleteToken } = useAuth();
+  const currentUser = useCurrentUser();
 
   const handleLogout = async () => {
-    // logout
+    deleteToken();
   };
 
   const anchorRef = useRef(null);
@@ -73,11 +83,24 @@ const Profile = () => {
     setOpen(false);
   };
 
-  const [value, setValue] = useState(0);
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
+  const getInitials = (fullName) => {
+    return fullName[0].toUpperCase();
   };
+
+  useEffect(() => {
+    const getCurrentUser = async (dispatch) => {
+      const response = await currentUser();
+      dispatch(activeUserEmail({ userEmail: response.data.email }));
+      dispatch(activeUserFullName({ userFullName: response.data.full_name }));
+    };
+    getCurrentUser(dispatch);
+  }, []);
+
+  // const [value, setValue] = useState(0);
+
+  // const handleChange = (event, newValue) => {
+  //   setValue(newValue);
+  // };
 
   const iconBackColorOpen = 'grey.300';
 
@@ -97,8 +120,23 @@ const Profile = () => {
         onClick={handleToggle}
       >
         <Stack direction="row" spacing={2} alignItems="center" sx={{ p: 0.5 }}>
-          <Avatar alt="profile user" src={avatar1} sx={{ width: 32, height: 32 }} />
-          <Typography variant="subtitle1">John Doe</Typography>
+          <div
+            style={{
+              backgroundColor: '#FF7A00',
+              width: '48px',
+              height: '48px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: 'bold',
+              fontSize: '20px'
+            }}
+          >
+            {getInitials(userFullName)}
+          </div>
+          <Typography variant="subtitle1"></Typography>
         </Stack>
       </ButtonBase>
       <Popper
@@ -139,11 +177,26 @@ const Profile = () => {
                       <Grid container justifyContent="space-between" alignItems="center">
                         <Grid item>
                           <Stack direction="row" spacing={1.25} alignItems="center">
-                            <Avatar alt="profile user" src={avatar1} sx={{ width: 32, height: 32 }} />
+                            <div
+                              style={{
+                                backgroundColor: '#FF7A00',
+                                width: '48px',
+                                height: '48px',
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: 'white',
+                                fontWeight: 'bold',
+                                fontSize: '20px'
+                              }}
+                            >
+                              {getInitials(userFullName)}
+                            </div>
                             <Stack>
-                              <Typography variant="h6">John Doe</Typography>
+                              <Typography variant="h6">{userFullName}</Typography>
                               <Typography variant="body2" color="textSecondary">
-                                UI/UX Designer
+                                {userEmail}
                               </Typography>
                             </Stack>
                           </Stack>
@@ -158,7 +211,7 @@ const Profile = () => {
                     {open && (
                       <>
                         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                          <Tabs variant="fullWidth" value={value} onChange={handleChange} aria-label="profile tabs">
+                          {/* <Tabs variant="fullWidth" value={value} onChange={handleChange} aria-label="profile tabs">
                             <Tab
                               sx={{
                                 display: 'flex',
@@ -183,14 +236,14 @@ const Profile = () => {
                               label="Setting"
                               {...a11yProps(1)}
                             />
-                          </Tabs>
+                          </Tabs> */}
                         </Box>
-                        <TabPanel value={value} index={0} dir={theme.direction}>
+                        {/* <TabPanel value={value} index={0} dir={theme.direction}>
                           <ProfileTab handleLogout={handleLogout} />
                         </TabPanel>
                         <TabPanel value={value} index={1} dir={theme.direction}>
                           <SettingTab />
-                        </TabPanel>
+                        </TabPanel> */}
                       </>
                     )}
                   </MainCard>

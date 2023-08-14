@@ -7,6 +7,8 @@ import 'simplebar/src/simplebar.css';
 
 // third-party
 import { Provider as ReduxProvider } from 'react-redux';
+import { CookiesProvider } from "react-cookie";
+
 
 // apex-chart
 import 'assets/third-party/apex-chart.css';
@@ -23,8 +25,10 @@ const root = createRoot(container); // createRoot(container!) if you use TypeScr
 root.render(
   <StrictMode>
     <ReduxProvider store={store}>
-      <BrowserRouter basename="/free">
-        <App />
+      <BrowserRouter>
+        <CookiesProvider>
+          <App />
+        </CookiesProvider>
       </BrowserRouter>
     </ReduxProvider>
   </StrictMode>

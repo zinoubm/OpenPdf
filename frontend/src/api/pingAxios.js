@@ -1,5 +1,7 @@
 import axios from "./axios"
 
-const ping = () => {
-
+async function ping() {
+    const res = await axios.get('http://localhost:8000/api/v1/users/sanity');
 }
+
+export default ping

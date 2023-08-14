@@ -12,7 +12,6 @@ import ThemeOption from './theme';
 
 const Palette = (mode) => {
   const colors = openpdfLightColors;
-  console.log(colors)
 
   const greyPrimary = [
     '#ffffff',

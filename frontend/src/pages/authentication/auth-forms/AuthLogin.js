@@ -1,5 +1,7 @@
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
+import useLogin from 'api/hooks/useLogin';
+import { Alert } from '@mui/material';
 
 // material-ui
 import {
@@ -18,12 +20,14 @@ import {
   Typography
 } from '@mui/material';
 
+import { useState } from 'react';
+
 // third party
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 
 // project import
-import FirebaseSocial from './FirebaseSocial';
+// import FirebaseSocial from './FirebaseSocial';
 import AnimateButton from 'components/@extended/AnimateButton';
 
 // assets
@@ -33,6 +37,8 @@ import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 
 const AuthLogin = () => {
   const [checked, setChecked] = React.useState(false);
+  const login = useLogin()
+  const [loginSuccess, setloginSuccess] = useState(null)
 
   const [showPassword, setShowPassword] = React.useState(false);
   const handleClickShowPassword = () => {
@@ -151,10 +157,18 @@ const AuthLogin = () => {
               )}
               <Grid item xs={12}>
                 <AnimateButton>
-                  <Button disableElevation disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained" color="primary">
+                  <Button onClick={async () => {
+                    setloginSuccess(await login(values.email, values.password))
+                  }} disableElevation disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained" color="primary">
                     Login
                   </Button>
                 </AnimateButton>
+                {
+                  loginSuccess === true ? (
+                    <Alert severity="info">Login Successful</Alert>
+                  ) : loginSuccess === false ? (
+                    <Alert severity="warning">Login Was Not Successful, Please Check Your Credentials!</Alert>
+                  ) : null}
               </Grid>
               <Grid item xs={12}>
                 <Divider>
@@ -162,7 +176,7 @@ const AuthLogin = () => {
                 </Divider>
               </Grid>
               <Grid item xs={12}>
-                <FirebaseSocial />
+                {/* <FirebaseSocial /> */}
               </Grid>
             </Grid>
           </form>

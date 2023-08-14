@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
+import { Alert } from '@mui/material';
+import useRegister from 'api/hooks/useRegister';
 
 // material-ui
 import {
@@ -23,7 +25,7 @@ import * as Yup from 'yup';
 import { Formik } from 'formik';
 
 // project import
-import FirebaseSocial from './FirebaseSocial';
+// import FirebaseSocial from './FirebaseSocial';
 import AnimateButton from 'components/@extended/AnimateButton';
 import { strengthColor, strengthIndicator } from 'utils/password-strength';
 
@@ -38,6 +40,9 @@ const AuthRegister = () => {
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
+
+  const register = useRegister();
+  const [registerSuccess, setregisterSuccess] = useState(null);
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
@@ -59,7 +64,7 @@ const AuthRegister = () => {
           firstname: '',
           lastname: '',
           email: '',
-          company: '',
+          // company: '',
           password: '',
           submit: null
         }}
@@ -127,7 +132,7 @@ const AuthRegister = () => {
                   )}
                 </Stack>
               </Grid>
-              <Grid item xs={12}>
+              {/* <Grid item xs={12}>
                 <Stack spacing={1}>
                   <InputLabel htmlFor="company-signup">Company</InputLabel>
                   <OutlinedInput
@@ -147,7 +152,7 @@ const AuthRegister = () => {
                     </FormHelperText>
                   )}
                 </Stack>
-              </Grid>
+              </Grid> */}
               <Grid item xs={12}>
                 <Stack spacing={1}>
                   <InputLabel htmlFor="email-signup">Email Address*</InputLabel>
@@ -239,10 +244,27 @@ const AuthRegister = () => {
               )}
               <Grid item xs={12}>
                 <AnimateButton>
-                  <Button disableElevation disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained" color="primary">
+                  <Button
+                    onClick={() => {
+                      setregisterSuccess(register(values.email, values.password, values.firstname + ' ' + values.lastname));
+                    }}
+                    disableElevation
+                    disabled={isSubmitting}
+                    fullWidth
+                    size="large"
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                  >
                     Create Account
                   </Button>
                 </AnimateButton>
+
+                {registerSuccess === true ? (
+                  <Alert severity="info">Login Successful</Alert>
+                ) : registerSuccess === false ? (
+                  <Alert severity="warning">Login Was Not Successful, Please Check Your Credentials!</Alert>
+                ) : null}
               </Grid>
               <Grid item xs={12}>
                 <Divider>
@@ -250,7 +272,7 @@ const AuthRegister = () => {
                 </Divider>
               </Grid>
               <Grid item xs={12}>
-                <FirebaseSocial />
+                {/* <FirebaseSocial /> */}
               </Grid>
             </Grid>
           </form>
