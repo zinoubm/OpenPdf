@@ -9,9 +9,9 @@ if TYPE_CHECKING:
     from .user import User  # noqa: F401
 
 
-class Item(Base):
+class Document(Base):
     id: int = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
     description = Column(String, index=True)
     owner_id = Column(Integer, ForeignKey("user.id"))
-    owner: "User" = relationship("User", back_populates="items")
+    owner: "User" = relationship("User", back_populates="documents")

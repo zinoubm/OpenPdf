@@ -4,23 +4,23 @@ from pydantic import BaseModel
 
 
 # Shared properties
-class ItemBase(BaseModel):
+class DocumentBase(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
 
 
 # Properties to receive on item creation
-class ItemCreate(ItemBase):
+class DocumentCreate(DocumentBase):
     title: str
 
 
 # Properties to receive on item update
-class ItemUpdate(ItemBase):
+class DocumentUpdate(DocumentBase):
     pass
 
 
 # Properties shared by models stored in DB
-class ItemInDBBase(ItemBase):
+class DocumentInDBBase(DocumentBase):
     id: int
     title: str
     owner_id: int
@@ -30,10 +30,10 @@ class ItemInDBBase(ItemBase):
 
 
 # Properties to return to client
-class Item(ItemInDBBase):
+class Document(DocumentInDBBase):
     pass
 
 
 # Properties properties stored in DB
-class ItemInDB(ItemInDBBase):
+class DocumentInDB(DocumentInDBBase):
     pass
