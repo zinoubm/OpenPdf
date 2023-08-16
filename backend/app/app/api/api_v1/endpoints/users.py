@@ -16,9 +16,6 @@ from app.utils import (
     send_verification_email,
 )
 
-# from google.oauth2 import id_token
-# from google.auth.transport import requests
-
 router = APIRouter()
 
 
@@ -124,62 +121,11 @@ def create_user_open(
         )
     user_in = schemas.UserCreate(password=password, email=email, full_name=full_name)
     user = crud.user.create(db, obj_in=user_in)
-    # generate verification token
-    # send verification email
-    password_reset_token = generate_email_verification_token(email=email)
+    email_verification_token = generate_email_verification_token(email=email)
     send_verification_email(
-        email_to=user.email, email=email, token=password_reset_token
+        email_to=user.email, email=email, token=email_verification_token
     )
     return user
-
-
-# @router.post("/google", response_model=schemas.Token)
-# def create_google_user(
-#     *,
-#     db: Session = Depends(deps.get_db),
-#     password: str = Body(...),
-#     token: str = Body(...),
-# ) -> Any:
-#     """
-#     Create new user with google flow
-#     """
-#     if not settings.USERS_OPEN_REGISTRATION:
-#         raise HTTPException(
-#             status_code=403,
-#             detail="Open user registration is forbidden on this server",
-#         )
-
-#     try:
-#         # hardcode It for now
-#         CLIENT_ID = (
-#             "351783991998-ct8g6ohg3igm8c4fb2p2kr7igcs8c3tm.apps.googleusercontent.com"
-#         )
-#         idinfo = id_token.verify_oauth2_token(token, requests.Request(), CLIENT_ID)
-#         userid = idinfo["sub"]
-#         useremail = idinfo["email"]
-
-#     except ValueError:
-#         raise HTTPException(
-#             status_code=400,
-#             detail="Something went wrong with your Google Account, Please retry again!",
-#         )
-
-#     user = crud.user.get_by_email(db, email=useremail)
-
-#     if user:
-#         raise HTTPException(
-#             status_code=400,
-#             detail="The user with this username already exists in the system",
-#         )
-
-#     # user_in = schemas.UserCreate(password=password, email=email, full_name=full_name)
-#     # user = crud.user.create(db, obj_in=user_in)
-
-#     # password_reset_token = generate_email_verification_token(email=email)
-#     # send_verification_email(
-#     #     email_to=user.email, email=email, token=password_reset_token
-#     # )
-#     return user
 
 
 @router.get("/verify", response_model=schemas.Msg)
@@ -187,12 +133,6 @@ def verify_user(
     token: str,
     db: Session = Depends(deps.get_db),
 ):
-    # verify the token and extract the user email
-    # if no email is present raise a token not valid error
-    # retrieve the user from the database
-    # if no user raise the apropriate exception
-    # if user not active raise apropriate exception
-    # set the is_verified field to True
     email = verify_email_verification_token(token)
     if not email:
         raise HTTPException(status_code=400, detail="Invalid token")

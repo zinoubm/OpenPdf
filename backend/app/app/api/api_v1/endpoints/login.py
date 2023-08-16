@@ -14,7 +14,11 @@ from app.utils import (
     generate_password_reset_token,
     send_reset_password_email,
     verify_password_reset_token,
+    generate_password,
 )
+
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 router = APIRouter()
 
@@ -34,6 +38,56 @@ def login_access_token(
     elif not crud.user.is_active(user):
         raise HTTPException(status_code=400, detail="Inactive user")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    return {
+        "access_token": security.create_access_token(
+            user.id, expires_delta=access_token_expires
+        ),
+        "token_type": "bearer",
+    }
+
+
+@router.post("/login/google", response_model=schemas.Token)
+def google_authentication(
+    *,
+    db: Session = Depends(deps.get_db),
+    token: str = Body(...),
+) -> Any:
+    """
+    Create new user with google flow
+    """
+    if not settings.USERS_OPEN_REGISTRATION:
+        raise HTTPException(
+            status_code=403,
+            detail="Open user registration is forbidden on this server",
+        )
+
+    try:
+        CLIENT_ID = settings.GOOGLE_CLIENT_ID
+
+        id_info = id_token.verify_oauth2_token(token, requests.Request(), CLIENT_ID)
+        user_id = id_info["sub"]
+        user_email = id_info["email"]
+        user_full_name = id_info["name"]
+
+    except ValueError:
+        raise HTTPException(
+            status_code=400,
+            detail="Something went wrong with your Google Account, Please retry again!",
+        )
+
+    user = crud.user.get_by_email(db, email=user_email)
+
+    if not user:
+        user_in = schemas.UserCreate(
+            password=generate_password(), email=user_email, full_name=user_full_name
+        )
+        user = crud.user.create(db, obj_in=user_in)
+
+    if not crud.user.is_active(user):
+        raise HTTPException(status_code=400, detail="Inactive user")
+
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+
     return {
         "access_token": security.create_access_token(
             user.id, expires_delta=access_token_expires

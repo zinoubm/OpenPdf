@@ -33,12 +33,14 @@ import AnimateButton from 'components/@extended/AnimateButton';
 // assets
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import { GoogleLogin } from '@react-oauth/google';
+import useGoogleLogin from 'api/hooks/useGoogleLogin';
 
 // ============================|| FIREBASE - LOGIN ||============================ //
 
 const AuthLogin = () => {
   const [checked, setChecked] = React.useState(false);
   const login = useLogin();
+  const googleLogin = useGoogleLogin();
   const [loginSuccess, setloginSuccess] = useState(null);
 
   const [showPassword, setShowPassword] = React.useState(false);
@@ -187,15 +189,14 @@ const AuthLogin = () => {
               <Grid item xs={12}>
                 <Stack alignItems="center">
                   <GoogleLogin
-                    onSuccess={(credentialResponse) => {
-                      console.log(credentialResponse);
+                    onSuccess={async (credentialResponse) => {
+                      setloginSuccess(await googleLogin(credentialResponse.credential));
                     }}
                     onError={() => {
-                      console.log('Login Failed');
+                      setloginSuccess(null);
                     }}
                   />
                 </Stack>
-                {/* <FirebaseSocial /> */}
               </Grid>
             </Grid>
           </form>

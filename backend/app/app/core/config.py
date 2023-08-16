@@ -85,6 +85,7 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER: EmailStr
     FIRST_SUPERUSER_PASSWORD: str
     USERS_OPEN_REGISTRATION: bool = False
+    GOOGLE_CLIENT_ID: str
 
     class Config:
         case_sensitive = True
