@@ -3,10 +3,11 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Optional
 
+from passlib import pwd
+
 from email.message import EmailMessage
 import smtplib
 
-import mailtrap as mt
 import emails
 
 from emails.template import JinjaTemplate
@@ -196,3 +197,7 @@ def verify_email_verification_token(token: str) -> Optional[str]:
         return decoded_token["sub"]
     except jwt.JWTError:
         return None
+
+
+def generate_password():
+    return pwd.genword()
