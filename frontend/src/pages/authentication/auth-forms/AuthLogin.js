@@ -32,13 +32,14 @@ import AnimateButton from 'components/@extended/AnimateButton';
 
 // assets
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import { GoogleLogin } from '@react-oauth/google';
 
 // ============================|| FIREBASE - LOGIN ||============================ //
 
 const AuthLogin = () => {
   const [checked, setChecked] = React.useState(false);
-  const login = useLogin()
-  const [loginSuccess, setloginSuccess] = useState(null)
+  const login = useLogin();
+  const [loginSuccess, setloginSuccess] = useState(null);
 
   const [showPassword, setShowPassword] = React.useState(false);
   const handleClickShowPassword = () => {
@@ -157,18 +158,26 @@ const AuthLogin = () => {
               )}
               <Grid item xs={12}>
                 <AnimateButton>
-                  <Button onClick={async () => {
-                    setloginSuccess(await login(values.email, values.password))
-                  }} disableElevation disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained" color="primary">
+                  <Button
+                    onClick={async () => {
+                      setloginSuccess(await login(values.email, values.password));
+                    }}
+                    disableElevation
+                    disabled={isSubmitting}
+                    fullWidth
+                    size="large"
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                  >
                     Login
                   </Button>
                 </AnimateButton>
-                {
-                  loginSuccess === true ? (
-                    <Alert severity="info">Login Successful</Alert>
-                  ) : loginSuccess === false ? (
-                    <Alert severity="warning">Login Was Not Successful, Please Check Your Credentials!</Alert>
-                  ) : null}
+                {loginSuccess === true ? (
+                  <Alert severity="info">Login Successful</Alert>
+                ) : loginSuccess === false ? (
+                  <Alert severity="warning">Login Was Not Successful, Please Check Your Credentials!</Alert>
+                ) : null}
               </Grid>
               <Grid item xs={12}>
                 <Divider>
@@ -176,6 +185,16 @@ const AuthLogin = () => {
                 </Divider>
               </Grid>
               <Grid item xs={12}>
+                <Stack alignItems="center">
+                  <GoogleLogin
+                    onSuccess={(credentialResponse) => {
+                      console.log(credentialResponse);
+                    }}
+                    onError={() => {
+                      console.log('Login Failed');
+                    }}
+                  />
+                </Stack>
                 {/* <FirebaseSocial /> */}
               </Grid>
             </Grid>

@@ -1,14 +1,14 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // scroll bar
 import 'simplebar/src/simplebar.css';
 
 // third-party
 import { Provider as ReduxProvider } from 'react-redux';
-import { CookiesProvider } from "react-cookie";
-
+import { CookiesProvider } from 'react-cookie';
 
 // apex-chart
 import 'assets/third-party/apex-chart.css';
@@ -26,9 +26,11 @@ root.render(
   <StrictMode>
     <ReduxProvider store={store}>
       <BrowserRouter>
-        <CookiesProvider>
-          <App />
-        </CookiesProvider>
+        <GoogleOAuthProvider clientId="351783991998-ct8g6ohg3igm8c4fb2p2kr7igcs8c3tm.apps.googleusercontent.com">
+          <CookiesProvider>
+            <App />
+          </CookiesProvider>
+        </GoogleOAuthProvider>
       </BrowserRouter>
     </ReduxProvider>
   </StrictMode>

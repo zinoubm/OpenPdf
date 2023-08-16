@@ -2,7 +2,7 @@
 .mypy_cache
 docker-stack.yml
 poetry.lock
-
+openpdf-credentials.json
 
 
 # Byte-compiled / optimized / DLL files

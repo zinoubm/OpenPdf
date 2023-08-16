@@ -3,6 +3,8 @@ import { Link as RouterLink } from 'react-router-dom';
 import { Alert } from '@mui/material';
 import useRegister from 'api/hooks/useRegister';
 
+import { GoogleLogin } from '@react-oauth/google';
+
 // material-ui
 import {
   Box,
@@ -272,6 +274,16 @@ const AuthRegister = () => {
                 </Divider>
               </Grid>
               <Grid item xs={12}>
+                <Stack alignItems="center">
+                  <GoogleLogin
+                    onSuccess={(credentialResponse) => {
+                      console.log(credentialResponse);
+                    }}
+                    onError={() => {
+                      console.log('Login Failed');
+                    }}
+                  />
+                </Stack>
                 {/* <FirebaseSocial /> */}
               </Grid>
             </Grid>
