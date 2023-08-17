@@ -14,3 +14,5 @@ sudo docker-compose exec backend bash /app/tests-start.sh -x
 "password": "12341234",
 "email": "lolo@example.com",
 "full_name": "string"
+
+# this is a dummy comment

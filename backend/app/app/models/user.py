@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, List
 
 from sqlalchemy import Boolean, Column, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Mapped
 
 from app.db.base_class import Base
 
@@ -18,4 +18,4 @@ class User(Base):
     is_verified: bool = Column(Boolean(), default=False)
     is_active: bool = Column(Boolean(), default=True)
     is_superuser: bool = Column(Boolean(), default=False)
-    documents: List["Document"] = relationship("Document", back_populates="owner")
+    documents: Mapped["Document"] = relationship("Document", back_populates="owner")
