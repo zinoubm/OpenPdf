@@ -67,7 +67,6 @@ class QdrantManager:
                 )
 
         except Exception as e:
-            self.recreate_collection()
             print(e)
 
     def recreate_collection(self):
@@ -135,6 +134,29 @@ class QdrantManager:
             ),
             query_vector=query_vector,
             limit=limit,
+        )
+
+        return response
+
+    def delete_points(self, user_id, document_id):
+        response = self.client.delete(
+            collection_name=self.collection_name,
+            points_selector=models.FilterSelector(
+                filter=models.Filter(
+                    must=[
+                        models.FieldCondition(
+                            key="user_id",
+                            match=models.MatchValue(
+                                value=user_id,
+                            ),
+                        ),
+                        models.FieldCondition(
+                            key="document_id",
+                            match=models.MatchValue(value=document_id),
+                        ),
+                    ]
+                )
+            ),
         )
 
         return response

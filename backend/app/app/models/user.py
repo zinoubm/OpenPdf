@@ -18,4 +18,4 @@ class User(Base):
     is_verified: bool = Column(Boolean(), default=False)
     is_active: bool = Column(Boolean(), default=True)
     is_superuser: bool = Column(Boolean(), default=False)
-    documents: Mapped["Document"] = relationship("Document", back_populates="owner")
+    documents: Mapped["Document"] = relationship("Document", back_populates="user")

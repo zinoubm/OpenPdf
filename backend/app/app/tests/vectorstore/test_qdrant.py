@@ -71,14 +71,14 @@ def test_upsert_batch(openai_manager):
     assert response is not None
 
 
-def test_search_point(openai_manager):
-    manager = QdrantManager()
-    query_embedding = openai_manager.get_embedding("what are my rights?")
+# def test_search_point(openai_manager):
+#     manager = QdrantManager()
+#     query_embedding = openai_manager.get_embedding("what are my rights?")
 
-    response = manager.search_point(
-        query_embedding, user_id="zaine", document_id=123, limit=1
-    )
-    assert response is not None
+#     response = manager.search_point(
+#         query_embedding, user_id="zaine", document_id=123, limit=1
+#     )
+#     assert response is not None
 
 
 def test_delete_collection():

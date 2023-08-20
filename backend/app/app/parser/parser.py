@@ -1,31 +1,29 @@
 import os
 
-# from fastapi import UploadFile
+from fastapi import UploadFile
 import mimetypes
 from app.parser.parsers import *
 
 # from app.schemas.document import Document
 
 
-# async def get_document_from_file(file: UploadFile, temp_file_path="/tmp/temp_file"):
-#     mimetype = file.content_type
-#     stream = await file.read()
+async def get_document_from_file(file: UploadFile, temp_file_path="/tmp/temp_file"):
+    mimetype = file.content_type
+    stream = await file.read()
 
-#     with open(temp_file_path, "wb") as file:
-#         file.write(stream)
+    with open(temp_file_path, "wb") as file:
+        file.write(stream)
 
-#     try:
-#         parsed_text = await extract_text_with_mimetype(temp_file_path, mimetype)
+    try:
+        parsed_text = await extract_text_with_mimetype(temp_file_path, mimetype)
 
-#     except Exception as e:
-#         os.remove(temp_file_path)
-#         raise Exception("Couldn't get document from file")
+    except Exception as e:
+        os.remove(temp_file_path)
+        raise Exception("Couldn't get document from file")
 
-#     os.remove(temp_file_path)
+    os.remove(temp_file_path)
 
-#     return Document(
-#         text=parsed_text,
-#     )
+    return parsed_text
 
 
 async def extract_text_with_mimetype(file_path, mimetype):

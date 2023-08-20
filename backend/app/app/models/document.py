@@ -23,10 +23,10 @@ if TYPE_CHECKING:
 
 class Document(Base):
     id: int = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
+    title = Column(String, index=True)
     preview = Column(String, nullable=True)
     uploaded_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
-    owner_id = Column(Integer, ForeignKey("user.id"))
-    owner: Mapped["User"] = relationship("User", back_populates="documents")
+    user_id = Column(Integer, ForeignKey("user.id"))
+    user: Mapped["User"] = relationship("User", back_populates="documents")

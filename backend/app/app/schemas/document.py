@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel
 
@@ -6,12 +6,12 @@ from pydantic import BaseModel
 # Shared properties
 class DocumentBase(BaseModel):
     title: Optional[str] = None
-    description: Optional[str] = None
+    # description: Optional[str] = None
 
 
 # Properties to receive on item creation
 class DocumentCreate(DocumentBase):
-    title: str
+    pass
 
 
 # Properties to receive on item update
@@ -23,7 +23,7 @@ class DocumentUpdate(DocumentBase):
 class DocumentInDBBase(DocumentBase):
     id: int
     title: str
-    owner_id: int
+    user_id: int
 
     class Config:
         orm_mode = True
@@ -37,3 +37,11 @@ class Document(DocumentInDBBase):
 # Properties properties stored in DB
 class DocumentInDB(DocumentInDBBase):
     pass
+
+
+class UpsertRequest(BaseModel):
+    documents: List[Document]
+
+
+class UpsertResponse(BaseModel):
+    id: str
