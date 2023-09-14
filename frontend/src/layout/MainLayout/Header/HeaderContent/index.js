@@ -1,9 +1,10 @@
 // material-ui
 // import { Box, IconButton, Link, useMediaQuery } from '@mui/material';
 // import { useMediaQuery } from '@mui/material';
-import { Box, useMediaQuery } from '@mui/material';
+import { Box, Chip, useMediaQuery } from '@mui/material';
+import Logo from 'components/Logo';
 // import { GithubOutlined } from '@ant-design/icons';
-
+import FileUploader from './FileUploader/index';
 // project import
 // import Search from './Search';
 import Profile from './Profile';
@@ -19,6 +20,16 @@ const HeaderContent = () => {
     <>
       {/* {!matchesXs && <Search />} */}
       {/* {matchesXs && <Box sx={{ width: '100%', ml: 1 }} />} */}
+      <Logo sx={{ marginLeft: '10px' }} />
+      <Chip
+        label={process.env.REACT_APP_VERSION}
+        size="small"
+        sx={{ height: 16, marginLeft: '10px', '& .MuiChip-label': { fontSize: '0.625rem', py: 0.25 } }}
+        component="a"
+        href="https://github.com/codedthemes/mantis-free-react-admin-template"
+        target="_blank"
+        clickable
+      />
       <Box sx={{ width: '100%', ml: 1 }} />
 
       {/* <IconButton
@@ -34,7 +45,7 @@ const HeaderContent = () => {
       </IconButton> */}
 
       {/* <Notification /> */}
-      {!matchesXs && <button>Upload</button>}
+      {!matchesXs && <FileUploader />}
       {!matchesXs && <Profile />}
       {matchesXs && <MobileSection />}
     </>

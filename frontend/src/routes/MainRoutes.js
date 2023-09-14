@@ -4,12 +4,12 @@ import { lazy } from 'react';
 import Loadable from 'components/Loadable';
 import MainLayout from 'layout/MainLayout';
 // import PrivateRoutes from './PrivateRoutes';
-import { Navigate } from "react-router-dom"
+import { Navigate } from 'react-router-dom';
 import useAuth from 'api/hooks/useAuth';
 
 // render - dashboard
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard')));
-const ChatingArea = Loadable(lazy(() => import('pages/dashboard/emptyPage')));
+const ChatingArea = Loadable(lazy(() => import('pages/Chat/index')));
 
 // render - sample page
 const SamplePage = Loadable(lazy(() => import('pages/extra-pages/SamplePage')));
@@ -20,7 +20,6 @@ const Color = Loadable(lazy(() => import('pages/components-overview/Color')));
 const Shadow = Loadable(lazy(() => import('pages/components-overview/Shadow')));
 const AntIcons = Loadable(lazy(() => import('pages/components-overview/AntIcons')));
 
-
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = () => {
@@ -28,11 +27,11 @@ const MainRoutes = () => {
 
   return {
     path: '/',
-    element: getToken() ? <MainLayout /> : <Navigate to={"/login"} />,
+    element: getToken() ? <MainLayout /> : <Navigate to={'/login'} />,
     children: [
       {
         path: '/',
-        element: <ChatingArea /> 
+        element: <ChatingArea />
       },
       {
         path: 'color',
@@ -64,8 +63,7 @@ const MainRoutes = () => {
         element: <AntIcons />
       }
     ]
-  }
-
+  };
 };
 
 export default MainRoutes;

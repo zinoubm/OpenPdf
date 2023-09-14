@@ -1,0 +1,22 @@
+import requests
+
+headers = {
+    "accept": "application/json",
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTQxNjU2NTgsInN1YiI6IjEwNiJ9.yIPEGFSn5NHCKKX_gln-zVa7TJwv3XekM5-hMzRpMZs",
+    "Content-Type": "application/x-www-form-urlencoded",
+}
+
+params = {
+    "query": "what is allowed by this document",
+    "document_id": "87",
+}
+
+with requests.post(
+    "http://localhost:8000/api/v1/documents/query-stream",
+    params=params,
+    headers=headers,
+    stream=True,
+) as r:
+    for chunk in r.iter_content(None, decode_unicode=True):
+        if chunk:
+            print(chunk, end="", flush=True)

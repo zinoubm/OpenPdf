@@ -96,12 +96,6 @@ const Profile = () => {
     getCurrentUser(dispatch);
   }, []);
 
-  // const [value, setValue] = useState(0);
-
-  // const handleChange = (event, newValue) => {
-  //   setValue(newValue);
-  // };
-
   const iconBackColorOpen = 'grey.300';
 
   return (
@@ -122,7 +116,7 @@ const Profile = () => {
         <Stack direction="row" spacing={2} alignItems="center" sx={{ p: 0.5 }}>
           <div
             style={{
-              backgroundColor: '#FF7A00',
+              backgroundColor: '#99DBF5',
               width: '48px',
               height: '48px',
               borderRadius: '50%',
@@ -179,7 +173,7 @@ const Profile = () => {
                           <Stack direction="row" spacing={1.25} alignItems="center">
                             <div
                               style={{
-                                backgroundColor: '#FF7A00',
+                                backgroundColor: '#99DBF5',
                                 width: '48px',
                                 height: '48px',
                                 borderRadius: '50%',

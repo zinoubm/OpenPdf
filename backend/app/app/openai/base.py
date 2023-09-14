@@ -1,12 +1,10 @@
 import os
-
-# from dotenv import load_dotenv
+import logging
 import openai
 
 
 class OpenAiManager:
     def __init__(self):
-        # load_dotenv()
         openai.api_key = os.getenv("OPENAI_API_KEY")
 
     def get_completion(
@@ -26,7 +24,7 @@ class OpenAiManager:
             )["choices"][0]["text"]
 
         except Exception as err:
-            print(f"Sorry, There was a problem \n\n {err}")
+            logging.error(f"Sorry, There was a problem \n\n {err}")
 
         return response
 
@@ -48,9 +46,28 @@ class OpenAiManager:
             )
 
         except Exception as err:
-            print(f"Sorry, There was a problem \n\n {err}")
+            logging.error(f"Sorry, There was a problem \n\n {err}")
 
         return response
+
+    def get_chat_completion_stream(self, prompt, model="gpt-3.5-turbo"):
+        try:
+            for chunk in openai.ChatCompletion.create(
+                model=model,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": prompt,
+                    }
+                ],
+                stream=True,
+            ):
+                content = chunk["choices"][0].get("delta", {}).get("content")
+                if content is not None:
+                    yield content + "\n"
+
+        except Exception as err:
+            logging.error(f"Sorry, There was a problem \n\n {err}")
 
     def get_embedding(self, prompt, model="text-embedding-ada-002"):
         prompt = prompt.replace("\n", " ")
@@ -62,7 +79,7 @@ class OpenAiManager:
             ]
 
         except Exception as err:
-            print(f"Sorry, There was a problem {err}")
+            logging.error(f"Sorry, There was a problem {err}")
 
         return embedding
 
@@ -74,7 +91,7 @@ class OpenAiManager:
             embeddings = openai.Embedding.create(input=prompts, model=model)["data"]
 
         except Exception as err:
-            print(f"Sorry, There was a problem {err}")
+            logging.error(f"Sorry, There was a problem {err}")
 
         return [embedding["embedding"] for embedding in embeddings]
 

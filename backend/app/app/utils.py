@@ -1,19 +1,17 @@
-import logging
+from typing import Any, Dict, Optional
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, Optional
+import logging
 
-from passlib import pwd
+from app.core.config import settings
 
 from email.message import EmailMessage
-import smtplib
-
+from passlib import pwd
 import emails
+import smtplib
 
 from emails.template import JinjaTemplate
 from jose import jwt
-
-from app.core.config import settings
 
 
 def send_email(
@@ -54,12 +52,6 @@ def send_email_future(
     smtp_from_email = settings.EMAILS_FROM_EMAIL
     text_subtype = "html"
 
-    print("smtp_host", smtp_host)
-    print("smtp_port", smtp_port)
-    print("smtp_user", smtp_user)
-    print("smtppassword", smtp_password)
-    print("smtp_from_email", smtp_from_email)
-
     message = EmailMessage()
     message.set_content(JinjaTemplate(html_template))
 
@@ -67,8 +59,6 @@ def send_email_future(
         message["subject"] = JinjaTemplate(subject_template)
         message["from"] = smtp_from_email
         message["to"] = email_to
-
-        print(message)
 
         with smtplib.SMTP(smtp_host, smtp_port) as server:
             server.login(smtp_user, smtp_password)

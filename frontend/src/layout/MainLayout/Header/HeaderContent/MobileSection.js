@@ -11,6 +11,7 @@ import Transitions from 'components/@extended/Transitions';
 
 // assets
 import { MoreOutlined } from '@ant-design/icons';
+import FileUploader from './FileUploader/index';
 
 // ==============================|| HEADER CONTENT - MOBILE ||============================== //
 
@@ -87,6 +88,7 @@ const MobileSection = () => {
                 <AppBar color="inherit">
                   <Toolbar>
                     {/* <Search /> */}
+                    <FileUploader />
                     <Profile />
                   </Toolbar>
                 </AppBar>

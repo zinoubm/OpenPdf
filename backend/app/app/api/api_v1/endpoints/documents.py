@@ -1,6 +1,9 @@
-from typing import Any, List
-
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi.responses import StreamingResponse
+
+from typing import Any, List
+from uuid import uuid4
+import logging
 from sqlalchemy.orm import Session
 
 from app.schemas.document import UpsertResponse
@@ -8,10 +11,8 @@ from app.parser.parser import get_document_from_file
 from app.parser.chunk import chunk_text
 
 from app.openai.base import openai_manager
-from app.openai.core import ask
+from app.openai.core import ask, ask_stream
 from app.vectorstore.qdrant import qdrant_manager
-from uuid import uuid4
-
 from app import crud, models, schemas
 from app.api import deps
 
@@ -24,13 +25,16 @@ router = APIRouter()
 )
 async def upsert_file(
     file: UploadFile = File(...),
-    # session: AsyncSession = Depends(get_async_session),
     db: Session = Depends(deps.get_db),
-    # user: User = Depends(current_user),
     current_user: models.User = Depends(deps.get_current_active_user),
 ):
+    if not file:
+        logging.error("There was a problem with file Upload")
+        raise HTTPException(status_code=500, detail="No File Recieved")
+
     # Until openpdf supports more document formats
     if file.content_type != "application/pdf":
+        logging.error("OpenPdf only supports PDFs")
         raise HTTPException(
             status_code=415, detail="Openpdf Does Not Support Other Formats Yet!"
         )
@@ -39,7 +43,6 @@ async def upsert_file(
     chunks = chunk_text(document_text, max_size=2000)
 
     document_in = schemas.DocumentCreate(title=file.filename)
-
     document = crud.document.create_with_user(
         db=db, obj_in=document_in, user_id=current_user.id
     )
@@ -56,13 +59,18 @@ async def upsert_file(
     embeddings = openai_manager.get_embeddings(chunks)
 
     try:
-        response = qdrant_manager.upsert_points(ids, payloads, embeddings)
+        res = qdrant_manager.upsert_points(ids, payloads, embeddings)
+        logging.info(f"Vector Store Response: {res}")
+
     except Exception as e:
+        logging.error(e)
+        crud.document.remove(db=db, id=document.id)
+        qdrant_manager.delete_points(user_id=current_user.id, document_id=document.id)
         raise HTTPException(
             status_code=502, detail="Something Went Wrong With The Vector Store!"
         )
 
-    print(response)
+    logging.info(f"Document Uploaded Succesfuly")
 
     return UpsertResponse(id=document.id)
 
@@ -121,62 +129,39 @@ async def query(
     return {"answer": answer, "context": context}
 
 
-# @router.post("/", response_model=schemas.Document)
-# def create_document(
-#     *,
-#     db: Session = Depends(deps.get_db),
-#     document_in: schemas.DocumentCreate,
-#     current_user: models.User = Depends(deps.get_current_active_user),
-# ) -> Any:
-#     """
-#     Create new document.
-#     """
-#     document = crud.document.create_with_user(
-#         db=db, obj_in=document_in, user_id=current_user.id
-#     )
-#     return document
+@router.post("/query-stream")
+async def query_stream(
+    query: str,
+    document_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> str:
+    document = crud.document.get(db=db, id=document_id)
 
+    if not document:
+        raise HTTPException(status_code=404, detail="Document not found")
+    if document.user_id != current_user.id:
+        raise HTTPException(status_code=400, detail="Not enough permissions")
 
-# @router.put("/{id}", response_model=schemas.Document)
-# def update_document(
-#     *,
-#     db: Session = Depends(deps.get_db),
-#     id: int,
-#     document_in: schemas.DocumentUpdate,
-#     current_user: models.User = Depends(deps.get_current_active_user),
-# ) -> Any:
-#     """
-#     Update an document.
-#     """
-#     document = crud.document.get(db=db, id=id)
-#     if not document:
-#         raise HTTPException(status_code=404, detail="Document not found")
-#     if not crud.user.is_superuser(current_user) and (
-#         document.owner_id != current_user.id
-#     ):
-#         raise HTTPException(status_code=400, detail="Not enough permissions")
-#     document = crud.document.update(db=db, db_obj=document, obj_in=document_in)
-#     return document
+    query_vector = openai_manager.get_embedding(query)
 
+    points = qdrant_manager.search_point(
+        query_vector=query_vector,
+        user_id=current_user.id,
+        document_id=document_id,
+        limit=5,
+    )
 
-# @router.get("/{id}", response_model=schemas.Document)
-# def read_document(
-#     *,
-#     db: Session = Depends(deps.get_db),
-#     id: int,
-#     current_user: models.User = Depends(deps.get_current_active_user),
-# ) -> Any:
-#     """
-#     Get document by ID.
-#     """
-#     document = crud.document.get(db=db, id=id)
-#     if not document:
-#         raise HTTPException(status_code=404, detail="Document not found")
-#     if not crud.user.is_superuser(current_user) and (
-#         document.user_id != current_user.id
-#     ):
-#         raise HTTPException(status_code=400, detail="Not enough permissions")
-#     return document
+    context = "\n\n\n".join([point.payload["chunk"] for point in points])
+
+    return StreamingResponse(
+        ask_stream(
+            context,
+            query,
+            openai_manager,
+        ),
+        media_type="text/event-stream",
+    )
 
 
 @router.delete("/{id}", response_model=schemas.Document)

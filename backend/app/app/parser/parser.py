@@ -4,8 +4,6 @@ from fastapi import UploadFile
 import mimetypes
 from app.parser.parsers import *
 
-# from app.schemas.document import Document
-
 
 async def get_document_from_file(file: UploadFile, temp_file_path="/tmp/temp_file"):
     mimetype = file.content_type

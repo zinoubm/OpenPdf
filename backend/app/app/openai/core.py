@@ -14,6 +14,20 @@ def ask(context, question, manager):
     return manager.get_chat_completion(prompt)
 
 
+def ask_stream(context, question, manager):
+    prompt = f"""
+    Answer the following question according to the provided context. If the context doesn't contain the answer, Do Not Answer!
+    If the context Is empty, Please Say No Context!
+
+    context: {context}
+
+    question: {question}
+
+    answer:
+    """
+    return manager.get_chat_completion_stream(prompt)
+
+
 def filter(context, question, manager):
     prompt = f"""
     Does the following context "{context}" contain the answer for the question "{question}"?

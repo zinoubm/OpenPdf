@@ -26,8 +26,6 @@ import {
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 
-// project import
-// import FirebaseSocial from './FirebaseSocial';
 import AnimateButton from 'components/@extended/AnimateButton';
 import { strengthColor, strengthIndicator } from 'utils/password-strength';
 
@@ -66,7 +64,6 @@ const AuthRegister = () => {
           firstname: '',
           lastname: '',
           email: '',
-          // company: '',
           password: '',
           submit: null
         }}
@@ -134,27 +131,7 @@ const AuthRegister = () => {
                   )}
                 </Stack>
               </Grid>
-              {/* <Grid item xs={12}>
-                <Stack spacing={1}>
-                  <InputLabel htmlFor="company-signup">Company</InputLabel>
-                  <OutlinedInput
-                    fullWidth
-                    error={Boolean(touched.company && errors.company)}
-                    id="company-signup"
-                    value={values.company}
-                    name="company"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    placeholder="Demo Inc."
-                    inputProps={{}}
-                  />
-                  {touched.company && errors.company && (
-                    <FormHelperText error id="helper-text-company-signup">
-                      {errors.company}
-                    </FormHelperText>
-                  )}
-                </Stack>
-              </Grid> */}
+
               <Grid item xs={12}>
                 <Stack spacing={1}>
                   <InputLabel htmlFor="email-signup">Email Address*</InputLabel>
@@ -276,15 +253,14 @@ const AuthRegister = () => {
               <Grid item xs={12}>
                 <Stack alignItems="center">
                   <GoogleLogin
-                    onSuccess={(credentialResponse) => {
-                      console.log(credentialResponse);
+                    onSuccess={() => {
+                      console.log('Logins Was Succesful');
                     }}
                     onError={() => {
                       console.log('Login Failed');
                     }}
                   />
                 </Stack>
-                {/* <FirebaseSocial /> */}
               </Grid>
             </Grid>
           </form>

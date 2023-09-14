@@ -2,11 +2,8 @@ import os
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
 
-# from dotenv import load_dotenv
+import logging
 from uuid import uuid4
-
-
-# load_dotenv()
 
 COLLECTION_NAME = os.getenv("COLLECTION_NAME")
 COLLECTION_SIZE = os.getenv("COLLECTION_SIZE")
@@ -67,7 +64,7 @@ class QdrantManager:
                 )
 
         except Exception as e:
-            print(e)
+            logging.error(e)
 
     def recreate_collection(self):
         self.client.recreate_collection(
