@@ -3,7 +3,7 @@ import axios from '../axios';
 const useRegister = () => {
   const register = async (email, password, full_name) => {
     try {
-      await axios.post(
+      const response = await axios.post(
         'users/open',
         {
           password: password,
@@ -17,7 +17,12 @@ const useRegister = () => {
           }
         }
       );
-      return true;
+
+      if (response.status === 200) {
+        return true;
+      }
+
+      return false;
     } catch (err) {
       return false;
     }

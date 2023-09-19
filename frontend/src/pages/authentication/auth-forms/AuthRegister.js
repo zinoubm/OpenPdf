@@ -225,7 +225,8 @@ const AuthRegister = () => {
                 <AnimateButton>
                   <Button
                     onClick={() => {
-                      setregisterSuccess(register(values.email, values.password, values.firstname + ' ' + values.lastname));
+                      register(values.email, values.password, values.firstname + ' ' + values.lastname);
+                      setregisterSuccess(true);
                     }}
                     disableElevation
                     disabled={isSubmitting}
@@ -240,9 +241,9 @@ const AuthRegister = () => {
                 </AnimateButton>
 
                 {registerSuccess === true ? (
-                  <Alert severity="info">Login Successful</Alert>
+                  <Alert severity="info">Congratulations, now please go to the login page and enter your Credentials</Alert>
                 ) : registerSuccess === false ? (
-                  <Alert severity="warning">Login Was Not Successful, Please Check Your Credentials!</Alert>
+                  <Alert severity="warning">Rejistering Was Not Successful, Please Check Your Credentials!</Alert>
                 ) : null}
               </Grid>
               <Grid item xs={12}>

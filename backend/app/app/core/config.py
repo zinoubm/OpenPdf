@@ -23,6 +23,7 @@ class Settings(BaseSettings):
         raise ValueError(v)
 
     PROJECT_NAME: str
+    SERVER_HOST: str
 
     POSTGRES_SERVER: str
     POSTGRES_USER: str

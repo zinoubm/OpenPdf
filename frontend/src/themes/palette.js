@@ -3,7 +3,7 @@ import { createTheme } from '@mui/material/styles';
 
 // third-party
 // import { presetPalettes } from '@ant-design/colors';
-import { openpdfLightColors } from './theme/openpdfColorPresets'
+import { openpdfLightColors } from './theme/openpdfColorPresets';
 
 // project import
 import ThemeOption from './theme';
