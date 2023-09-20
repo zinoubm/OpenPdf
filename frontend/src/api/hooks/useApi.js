@@ -37,7 +37,7 @@ const useApi = () => {
     });
 
     try {
-      const response = await fetch('http://localhost:8000/api/v1/documents/query-stream?' + params.toString(), {
+      const response = await fetch(process.env.REACT_APP_BACKEND_URL + '/api/v1/documents/query-stream?' + params.toString(), {
         method: 'POST',
         headers: headers
       });

@@ -1,7 +1,7 @@
-import axios from "./axios"
+import axios from './axios';
 
 async function ping() {
-    const res = await axios.get('http://localhost:8000/api/v1/users/sanity');
+  const res = await axios.get('users/sanity');
 }
 
-export default ping
+export default ping;
