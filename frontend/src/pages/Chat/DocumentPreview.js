@@ -6,7 +6,7 @@ function DocumentPreview() {
   return (
     <Card style={{ height: '100%' }}>
       <Typography variant="h4">Document Preview</Typography>
-      <Typography variant="p">Comming Soon</Typography>
+      <Typography variant="p">Coming Soon</Typography>
     </Card>
   );
 }
