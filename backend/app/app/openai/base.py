@@ -64,7 +64,7 @@ class OpenAiManager:
             ):
                 content = chunk["choices"][0].get("delta", {}).get("content")
                 if content is not None:
-                    yield content + "\n"
+                    yield content
 
         except Exception as err:
             logging.error(f"Sorry, There was a problem \n\n {err}")
