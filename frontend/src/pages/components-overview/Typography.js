@@ -1,5 +1,5 @@
 // material-ui
-import { Breadcrumbs, Divider, Grid, Link, Stack, Typography } from '@mui/material';
+import { Breadcrumbs, Divider, Grid, Stack, Typography } from '@mui/material';
 
 // project import
 import ComponentSkeleton from './ComponentSkeleton';
@@ -173,16 +173,6 @@ const ComponentTypography = () => (
               <Typography variant="overline">
                 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
               </Typography>
-              <Breadcrumbs aria-label="breadcrumb">
-                <Typography variant="h6">Size: 12px</Typography>
-                <Typography variant="h6">Weight: Regular</Typography>
-                <Typography variant="h6">Line Height: 20px</Typography>
-              </Breadcrumbs>
-            </Stack>
-          </MainCard>
-          <MainCard title="Link" codeHighlight>
-            <Stack spacing={1.5}>
-              <Link href="#">www.mantis.com</Link>
               <Breadcrumbs aria-label="breadcrumb">
                 <Typography variant="h6">Size: 12px</Typography>
                 <Typography variant="h6">Weight: Regular</Typography>
