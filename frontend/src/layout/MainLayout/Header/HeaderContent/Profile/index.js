@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import { useRef, useState, useEffect } from 'react';
 import useAuth from 'api/hooks/useAuth';
-import useCurrentUser from 'api/hooks/useCurrentUser';
+// import useCurrentUser from 'api/hooks/useCurrentUser';
+import useApi from 'api/hooks/useApi';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { activeUserEmail, activeUserFullName } from 'store/reducers/auth';
@@ -27,11 +28,6 @@ import {
 // project import
 import MainCard from 'components/MainCard';
 import Transitions from 'components/@extended/Transitions';
-// import ProfileTab from './ProfileTab';
-// import SettingTab from './SettingTab';
-
-// assets
-// import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { LogoutOutlined } from '@ant-design/icons';
 
 // tab panel wrapper
@@ -64,7 +60,8 @@ const Profile = () => {
   const dispatch = useDispatch();
 
   const { deleteToken } = useAuth();
-  const currentUser = useCurrentUser();
+  // const currentUser = useCurrentUser();
+  const { currentUser } = useApi();
 
   const handleLogout = async () => {
     deleteToken();
@@ -90,8 +87,10 @@ const Profile = () => {
   useEffect(() => {
     const getCurrentUser = async (dispatch) => {
       const response = await currentUser();
-      dispatch(activeUserEmail({ userEmail: response.data.email }));
-      dispatch(activeUserFullName({ userFullName: response.data.full_name }));
+      if (response.success) {
+        dispatch(activeUserEmail({ userEmail: response.data.email }));
+        dispatch(activeUserFullName({ userFullName: response.data.full_name }));
+      }
     };
     getCurrentUser(dispatch);
   }, []);

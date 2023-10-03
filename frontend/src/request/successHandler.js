@@ -3,8 +3,10 @@ import { notification } from 'antd';
 import codeMessage from './codeMessage';
 
 const successHandler = (response, options = { notifyOnSuccess: false, notifyOnFailed: true }) => {
-  const { data } = response;
-
+  const { data, status } = response;
+  const message = codeMessage[status];
+  console.log('data from success');
+  console.log(data);
   if (data) {
     if (options.notifyOnSuccess) {
       notification.config({
@@ -12,16 +14,12 @@ const successHandler = (response, options = { notifyOnSuccess: false, notifyOnFa
       });
       notification.success({
         message: `Request success`,
-        description: successText
+        description: message,
+        placement: 'bottomLeft'
       });
-
-      return data;
     }
+    return { success: true, data: data };
   }
-
-  const errorText = codeMessage[response.status];
-
-  const { status } = response;
 
   if (options.notifyOnFailed) {
     notification.config({
@@ -29,11 +27,12 @@ const successHandler = (response, options = { notifyOnSuccess: false, notifyOnFa
     });
     notification.error({
       message: `Request error ${status}`,
-      description: errorText
+      description: message,
+      placement: 'bottomLeft'
     });
   }
 
-  return null;
+  return { success: false, data: null };
 };
 
 export default successHandler;

@@ -1,17 +1,15 @@
 import { FormControl, InputLabel, Select, Typography } from '@mui/material';
-import { useSelector } from 'react-redux';
-
 import SimpleBar from 'components/third-party/SimpleBar';
 import DocumentPicker from './DocumentPicker/index';
 import useApi from 'api/hooks/useApi';
 import { useState, useEffect } from 'react';
 
-// ==============================|| DRAWER CONTENT ||============================== //
+import { useSelector } from 'react-redux';
 
 const DrawerContent = () => {
   const { getDocuments } = useApi();
   const [documents, setDocuments] = useState([]);
-  const { documentName } = useSelector((state) => state.app);
+  const { documentName, refreshKey } = useSelector((state) => state.app);
 
   useEffect(() => {
     const fetchDocuments = async () => {
@@ -19,7 +17,7 @@ const DrawerContent = () => {
     };
 
     fetchDocuments();
-  }, []);
+  }, [refreshKey]);
 
   return (
     <SimpleBar

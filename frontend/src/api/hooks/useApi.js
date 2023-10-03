@@ -1,10 +1,48 @@
+import errorHandler from 'request/errorHandler';
 import axios from '../axios';
 import useAuth from './useAuth';
 import { useNavigate } from 'react-router-dom';
+import successHandler from 'request/successHandler';
 
 const useApi = () => {
   const { getToken } = useAuth();
   const navigate = useNavigate();
+
+  const currentUser = async () => {
+    try {
+      const response = await axios.get('users/me', {
+        headers: {
+          accept: 'application/json',
+          Authorization: 'Bearer ' + getToken()
+        }
+      });
+
+      return successHandler(response);
+    } catch (err) {
+      navigate('/login');
+      return errorHandler(err);
+    }
+  };
+
+  const uploadDocument = async (file) => {
+    try {
+      const form = new FormData();
+      form.append('file', file);
+
+      const response = await axios.post('/documents/upsert', form, {
+        headers: {
+          accept: 'application/json',
+          Authorization: 'Bearer ' + getToken(),
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      return successHandler(response, { notifyOnSuccess: true });
+    } catch (err) {
+      navigate('/login');
+      return errorHandler(err);
+    }
+  };
 
   const getDocuments = async () => {
     try {
@@ -86,7 +124,7 @@ const useApi = () => {
     }
   };
 
-  return { getDocuments, queryDocument, deleteDocument };
+  return { currentUser, uploadDocument, getDocuments, queryDocument, deleteDocument };
 };
 
 export default useApi;

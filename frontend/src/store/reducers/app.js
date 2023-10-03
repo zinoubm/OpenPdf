@@ -4,7 +4,8 @@ import { createSlice } from '@reduxjs/toolkit';
 // initial state
 const initialState = {
   documentId: null,
-  documentName: 'Please select a document.'
+  documentName: 'Please select a document.',
+  refreshKey: 0
 };
 
 const app = createSlice({
@@ -16,10 +17,13 @@ const app = createSlice({
     },
     activeDocumentName: (state, action) => {
       state.documentName = action.payload.documentName;
+    },
+    updateRefresKey: (state) => {
+      state.refreshKey += 1;
     }
   }
 });
 
 export default app.reducer;
 
-export const { activeDocumentId, activeDocumentName } = app.actions;
+export const { activeDocumentId, activeDocumentName, updateRefresKey } = app.actions;

@@ -2,18 +2,23 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { CloudUploadOutlined } from '@ant-design/icons';
-import useUploadFile from 'api/hooks/useUploadFile';
+import useApi from 'api/hooks/useApi';
 import { useState } from 'react';
 
+import { useDispatch } from 'react-redux';
+import { updateRefresKey } from 'store/reducers/app';
+
 function FileUploader() {
-  const uploadFile = useUploadFile();
+  const { uploadDocument } = useApi();
+  const dispatch = useDispatch();
+
   const [isLoading, setIsLoading] = useState(false);
 
   const handleUpload = ({ target }) => {
     setIsLoading(true);
-    uploadFile(target.files[0]).then((res) => {
-      console.log(res);
+    uploadDocument(target.files[0]).then(() => {
       setIsLoading(false);
+      dispatch(updateRefresKey());
     });
   };
 
