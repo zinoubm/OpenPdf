@@ -2,6 +2,8 @@ import os
 
 from fastapi import UploadFile
 import mimetypes
+
+# import logging
 from app.parser.parsers import *
 
 
@@ -24,10 +26,24 @@ async def get_document_from_file(file: UploadFile, temp_file_path="/tmp/temp_fil
     return parsed_text
 
 
-async def extract_text_with_mimetype(file_path, mimetype):
+async def get_document_from_file_stream(file_path):
+    try:
+        parsed_text = await extract_text_with_mimetype(file_path)
+
+    except Exception as e:
+        os.remove(file_path)
+        raise Exception("Couldn't get document from file")
+
+    os.remove(file_path)
+
+    return parsed_text
+
+
+async def extract_text_with_mimetype(file_path, mimetype=None):
+    # logging.INFO(f"extracting text from file {file_path} and mimetype {mimetype}")
     if mimetype is None:
         mimetype, _ = mimetypes.guess_type(file_path)
-
+        # logging.INFO(f"File Mimetype Is: {mimetype}")
     if mimetype is None:
         raise Exception("Unsupported file type")
 

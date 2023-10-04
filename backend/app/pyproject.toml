@@ -35,6 +35,7 @@ reportlab = "^4.0.4"
 python-docx = "^0.8.11"
 openai = "^0.27.8"
 qdrant-client = "^1.4.0"
+streaming-form-data = "^1.13.0"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.971"

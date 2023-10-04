@@ -89,11 +89,10 @@ class OpenAiManager:
         embeddings = None
         try:
             embeddings = openai.Embedding.create(input=prompts, model=model)["data"]
+            return [embedding["embedding"] for embedding in embeddings]
 
         except Exception as err:
             logging.error(f"Sorry, There was a problem {err}")
-
-        return [embedding["embedding"] for embedding in embeddings]
 
 
 openai_manager = OpenAiManager()
