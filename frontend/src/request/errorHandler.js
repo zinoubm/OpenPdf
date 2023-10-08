@@ -1,7 +1,7 @@
 import { notification } from 'antd';
 
 const errorHandler = (error) => {
-  console.log(error);
+  console.error(error);
 
   notification.config({
     duration: 10

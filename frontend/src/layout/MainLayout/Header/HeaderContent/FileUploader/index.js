@@ -9,14 +9,14 @@ import { useDispatch } from 'react-redux';
 import { updateRefresKey } from 'store/reducers/app';
 
 function FileUploader() {
-  const { uploadDocument } = useApi();
+  const { uploadDocumentStream } = useApi();
   const dispatch = useDispatch();
 
   const [isLoading, setIsLoading] = useState(false);
 
   const handleUpload = ({ target }) => {
     setIsLoading(true);
-    uploadDocument(target.files[0]).then(() => {
+    uploadDocumentStream(target.files[0]).then(() => {
       setIsLoading(false);
       dispatch(updateRefresKey());
     });

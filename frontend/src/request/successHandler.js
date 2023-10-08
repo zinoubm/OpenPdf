@@ -5,8 +5,6 @@ import codeMessage from './codeMessage';
 const successHandler = (response, options = { notifyOnSuccess: false, notifyOnFailed: true }) => {
   const { data, status } = response;
   const message = codeMessage[status];
-  console.log('data from success');
-  console.log(data);
   if (data) {
     if (options.notifyOnSuccess) {
       notification.config({

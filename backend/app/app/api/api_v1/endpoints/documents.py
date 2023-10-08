@@ -102,6 +102,9 @@ class MaxBodySizeValidator:
             raise MaxBodySizeException(body_len=self.body_len)
 
 
+import time
+
+
 @router.post("/upsert-stream")
 async def upsert_stream(
     request: Request,
@@ -128,10 +131,7 @@ async def upsert_stream(
             body_validator(chunk)
             parser.data_received(chunk)
 
-        logging.info("getting text from stream")
         document_text = await get_document_from_file_stream(filepath)
-
-        # print(document_text)
 
         chunks = chunk_text(document_text, max_size=2000)
 
@@ -151,31 +151,21 @@ async def upsert_stream(
         ]
         embeddings = openai_manager.get_embeddings(chunks)
 
-        print("embeddings succesful")
-
-        res = qdrant_manager.upsert_points(ids, payloads, embeddings)
-        logging.info(f"Vector Store Response: {res}")
-
-    except Exception as e:
-        logging.error(e)
-        crud.document.remove(db=db, id=document.id)
-        qdrant_manager.delete_points(user_id=current_user.id, document_id=document.id)
-        raise HTTPException(
-            status_code=502, detail="Something Went Wrong With The Vector Store!"
-        )
-
     except ClientDisconnect:
         print("Client Disconnected")
+
     except MaxBodySizeException as e:
         raise HTTPException(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
             detail=f"Maximum request body size limit ({MAX_REQUEST_BODY_SIZE} bytes) exceeded ({e.body_len} bytes read)",
         )
+
     except streaming_form_data.validators.ValidationError:
         raise HTTPException(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
             detail=f"Maximum file size limit ({MAX_FILE_SIZE} bytes) exceeded",
         )
+
     except Exception:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -187,8 +177,14 @@ async def upsert_stream(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="File is missing"
         )
 
-    print(data.value.decode())
-    print(file_.multipart_filename)
+    try:
+        res = qdrant_manager.upsert_points(ids, payloads, embeddings)
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Couldn't upload embeddings to the Vectorstore",
+        )
 
     return {"message": f"Successfuly uploaded {filename}"}
 

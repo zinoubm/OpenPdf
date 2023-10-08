@@ -6,6 +6,7 @@ import openai
 class OpenAiManager:
     def __init__(self):
         openai.api_key = os.getenv("OPENAI_API_KEY")
+        openai.organization = os.getenv("OPENAI_ORGANIZATION")
 
     def get_completion(
         self,

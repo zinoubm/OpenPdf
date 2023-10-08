@@ -43,7 +43,7 @@ class QdrantManager:
         self.port = port
         self.api_key = api_key
 
-        self.client = QdrantClient(host=host, port=port, api_key=api_key)
+        self.client = QdrantClient(host=host, port=port, api_key=api_key, timeout=200)
         self.setup_collection(collection_size, recreate_collection)
 
     def setup_collection(self, collection_size: int, recreate_collection: bool):

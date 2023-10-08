@@ -44,6 +44,29 @@ const useApi = () => {
     }
   };
 
+  const uploadDocumentStream = async (file) => {
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      form.append('data', '');
+
+      const response = await axios.post('/documents/upsert-stream', form, {
+        headers: {
+          accept: 'application/json',
+          Authorization: 'Bearer ' + getToken(),
+          'Content-Type': 'multipart/form-data',
+          Filename: file.name
+        },
+        timeout: 200 * 1000 // 200 seconds
+      });
+
+      return successHandler(response, { notifyOnSuccess: true });
+    } catch (err) {
+      navigate('/login');
+      return errorHandler(err);
+    }
+  };
+
   const getDocuments = async () => {
     try {
       const response = await axios.get('/documents/', {
@@ -124,7 +147,7 @@ const useApi = () => {
     }
   };
 
-  return { currentUser, uploadDocument, getDocuments, queryDocument, deleteDocument };
+  return { currentUser, uploadDocument, uploadDocumentStream, getDocuments, queryDocument, deleteDocument };
 };
 
 export default useApi;
