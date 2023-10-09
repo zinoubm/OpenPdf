@@ -1,14 +1,7 @@
-// material-ui
-// import { Box, IconButton, Link, useMediaQuery } from '@mui/material';
-// import { useMediaQuery } from '@mui/material';
 import { Box, Chip, useMediaQuery } from '@mui/material';
 import Logo from 'components/Logo';
-// import { GithubOutlined } from '@ant-design/icons';
 import FileUploader from './FileUploader/index';
-// project import
-// import Search from './Search';
 import Profile from './Profile';
-// import Notification from './Notification';
 import MobileSection from './MobileSection';
 
 // ==============================|| HEADER - CONTENT ||============================== //

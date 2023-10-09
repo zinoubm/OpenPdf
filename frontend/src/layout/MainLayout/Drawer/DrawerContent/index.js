@@ -1,15 +1,51 @@
+import { useState, useEffect } from 'react';
+
+import { Menu } from 'antd';
+import { FilePdfOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import { FormControl, InputLabel, Select, Typography } from '@mui/material';
+
 import SimpleBar from 'components/third-party/SimpleBar';
 import DocumentPicker from './DocumentPicker/index';
 import useApi from 'api/hooks/useApi';
-import { useState, useEffect } from 'react';
 
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { activeDocumentId, activeDocumentName } from 'store/reducers/app';
+
+function getItem(label, key, icon, children, type) {
+  return {
+    key,
+    icon,
+    children,
+    label,
+    type
+  };
+}
 
 const DrawerContent = () => {
-  const { getDocuments } = useApi();
   const [documents, setDocuments] = useState([]);
+  const [menuItems, setMenuItems] = useState([]);
+
+  const { getDocuments } = useApi();
+
+  const dispatch = useDispatch();
   const { documentName, refreshKey } = useSelector((state) => state.app);
+
+  const handleSelectDocument = (e) => {
+    dispatch(activeDocumentId({ documentId: e.key }));
+    dispatch(activeDocumentName({ documentName: documents.find((document) => document.id == e.key).title }));
+  };
+
+  useEffect(() => {
+    const itemsDocumentsList = documents.map((document) => getItem(document.title, document.id));
+    const items = [
+      getItem('Documents', 'documents-sub', <FilePdfOutlined />, itemsDocumentsList),
+      getItem('Collections', 'collections-sub', <UnorderedListOutlined />, []),
+      {
+        type: 'divider'
+      }
+    ];
+    setMenuItems(items);
+  }, [documents]);
 
   useEffect(() => {
     const fetchDocuments = async () => {
@@ -37,6 +73,16 @@ const DrawerContent = () => {
           ))}
         </Select>
       </FormControl>
+
+      <Menu
+        onClick={handleSelectDocument}
+        style={{
+          width: 256
+        }}
+        defaultOpenKeys={['documents-sub']}
+        mode="inline"
+        items={menuItems}
+      />
     </SimpleBar>
   );
 };

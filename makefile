@@ -16,3 +16,4 @@ sudo docker-compose exec backend bash /app/tests-start.sh -x
 "full_name": "string"
 
 # this is a dummy comment
+# open source reference https://demo-erp-crm.idurarapp.com/

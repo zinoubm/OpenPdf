@@ -16,7 +16,7 @@ const DrawerHeader = ({ open }) => {
   return (
     // only available in paid version
     <DrawerHeaderStyled theme={theme} open={open}>
-      <Typography variant="h4">My Documents</Typography>
+      <Typography variant="h4">Menu</Typography>
       <Stack direction="row" spacing={1} alignItems="center"></Stack>
     </DrawerHeaderStyled>
   );
