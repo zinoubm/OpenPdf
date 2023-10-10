@@ -8,6 +8,14 @@ import { UserOutlined } from '@ant-design/icons';
 import useApi from 'api/hooks/useApi';
 import './scrollBar.css';
 
+const defaultMessage = [
+  {
+    entity: 'bot',
+    message:
+      'Hey there, you can try something like: "Give a summary of this document" or "What are the main points discussed in this document?"'
+  }
+];
+
 const ChatBox = () => {
   const { queryDocument } = useApi();
   const [messages, setMessages] = useState([]);
@@ -63,7 +71,7 @@ const ChatBox = () => {
         style={{ padding: '2em', overflowY: 'auto', height: '85%' }}
         itemLayout="horizontal"
         className="custom-scrollbar"
-        dataSource={messages}
+        dataSource={messages.length > 0 ? messages : defaultMessage}
         ref={listRef}
         renderItem={(item) => (
           <List.Item style={{ padding: '1em' }}>
