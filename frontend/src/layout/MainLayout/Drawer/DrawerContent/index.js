@@ -27,7 +27,6 @@ const DrawerContent = () => {
     };
     return (
       <Menu.Item key={key} title={title} style={{ display: 'flex', justifyContent: 'space-between' }} {...props}>
-        {children}
         <Button
           loading={isLoading}
           onClick={handleDeleteDocument}
@@ -35,6 +34,7 @@ const DrawerContent = () => {
           style={{ margin: '1em' }}
           icon={<DeleteOutlined style={{ fontSize: '1em' }} />}
         />
+        {children}
       </Menu.Item>
     );
   };
