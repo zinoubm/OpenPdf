@@ -16,4 +16,7 @@ def chunk_text(text, max_size=4000):
             chuncks.append(chunck.strip())
             chunck = ""
 
+    if not chuncks:
+        chuncks.append(chunck.strip())
+
     return chuncks
