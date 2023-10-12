@@ -1,15 +1,17 @@
 import { notification } from 'antd';
+import codeMessage from './codeMessage';
 
 const errorHandler = (error) => {
   console.error(error);
+  const statusCode = error.response.status;
 
   notification.config({
     duration: 10
   });
   notification.error({
     message: 'Oops',
-    description: 'Something Went Wrong, Please Refresh and Retry Again',
-    placement: 'bottomLeft'
+    description: codeMessage[statusCode],
+    placement: 'bottomRight'
   });
 
   return { success: false, data: null };

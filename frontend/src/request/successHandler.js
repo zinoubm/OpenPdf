@@ -13,7 +13,7 @@ const successHandler = (response, options = { notifyOnSuccess: false, notifyOnFa
       notification.success({
         message: `Request success`,
         description: message,
-        placement: 'bottomLeft'
+        placement: 'bottomRight'
       });
     }
     return { success: true, data: data };
@@ -26,7 +26,7 @@ const successHandler = (response, options = { notifyOnSuccess: false, notifyOnFa
     notification.error({
       message: `Request error ${status}`,
       description: message,
-      placement: 'bottomLeft'
+      placement: 'bottomRight'
     });
   }
 

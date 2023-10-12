@@ -19,7 +19,7 @@ const useApi = () => {
 
       return successHandler(response);
     } catch (err) {
-      navigate('/login');
+      if (err.response.status === 403) navigate('/login');
       return errorHandler(err);
     }
   };
@@ -39,7 +39,7 @@ const useApi = () => {
 
       return successHandler(response, { notifyOnSuccess: true });
     } catch (err) {
-      navigate('/login');
+      if (err.response.status === 403) navigate('/login');
       return errorHandler(err);
     }
   };
@@ -62,7 +62,7 @@ const useApi = () => {
 
       return successHandler(response, { notifyOnSuccess: true });
     } catch (err) {
-      navigate('/login');
+      if (err.response.status === 403) navigate('/login');
       return errorHandler(err);
     }
   };
@@ -81,8 +81,8 @@ const useApi = () => {
       });
       return response.data;
     } catch (err) {
-      navigate('/login');
-      return null;
+      if (err.response.status === 403) navigate('/login');
+      return errorHandler(err);
     }
   };
 
@@ -113,7 +113,9 @@ const useApi = () => {
 
       let streamingDone = false;
       let accumulatedResponse = '';
+
       setIsLoading(true);
+
       while (!streamingDone) {
         const { done, value } = await reader.read();
 
@@ -126,8 +128,10 @@ const useApi = () => {
         setMessages([...messages, { entity: 'bot', message: accumulatedResponse }]);
       }
       setIsLoading(false);
-    } catch (error) {
-      console.error('Error:', error);
+    } catch (err) {
+      console.error('Error:', err);
+      if (err.response.status === 403) navigate('/login');
+      return errorHandler(err);
     }
   };
 
@@ -142,8 +146,8 @@ const useApi = () => {
 
       return response;
     } catch (err) {
-      navigate('/login');
-      return null;
+      if (err.response.status === 403) navigate('/login');
+      return errorHandler(err);
     }
   };
 
