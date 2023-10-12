@@ -104,7 +104,9 @@ const useApi = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        const error = new Error(`HTTP error! Status: ${response.status}`);
+        error.status = response.status;
+        throw error;
       }
 
       const stream = response.body;
@@ -130,8 +132,8 @@ const useApi = () => {
       setIsLoading(false);
     } catch (err) {
       console.error('Error:', err);
-      if (err.response.status === 403) navigate('/login');
-      return errorHandler(err);
+      if (err.status === 403) navigate('/login');
+      // return errorHandler(err, err.status);
     }
   };
 
