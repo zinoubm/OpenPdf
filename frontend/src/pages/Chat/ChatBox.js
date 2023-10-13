@@ -8,6 +8,8 @@ import useApi from 'api/hooks/useApi';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateIsLoading } from 'store/reducers/chat';
 
+import Markdown from 'react-markdown';
+
 import miniLogo from 'assets/images/miniLogo.svg';
 import './scrollBar.css';
 
@@ -113,10 +115,37 @@ const ChatBox = () => {
                 }}
               />
             )}
-            {item.message}
+            {messages.length > 0 ? <Markdown>{item.message}</Markdown> : item.message}
           </List.Item>
         )}
       />
+
+      {/* <ul style={{ padding: '2em', overflowY: 'auto', height: '52vh' }} className="custom-scrollbar" ref={listRef}>
+        {(messages.length > 0 ? messages : defaultMessage).map((item, index) => (
+          <li key={index} style={{ padding: '1em' }}>
+            {item.entity === 'user' ? (
+              <UserOutlined
+                style={{
+                  marginRight: '1em',
+                  fontSize: '1.4em'
+                }}
+              />
+            ) : (
+              <img
+                src={miniLogo}
+                alt="entity"
+                style={{
+                  width: '1em',
+                  height: 'auto',
+                  marginRight: '1em'
+                }}
+              />
+            )}
+            {console.log(item.message)}
+            <Markdown>{item.message.toString()}</Markdown>
+          </li>
+        ))}
+      </ul> */}
 
       <Space.Compact style={{ height: '3em', width: '100%' }}>
         <Input
