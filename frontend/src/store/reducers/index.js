@@ -5,9 +5,10 @@ import { combineReducers } from 'redux';
 import menu from './menu';
 import auth from './auth';
 import app from './app';
+import chat from './chat';
 
 // ==============================|| COMBINE REDUCERS ||============================== //
 
-const reducers = combineReducers({ menu, auth, app });
+const reducers = combineReducers({ menu, auth, app, chat });
 
 export default reducers;
