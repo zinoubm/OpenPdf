@@ -12,32 +12,25 @@ import './scrollBar.css';
 
 const { Title } = Typography;
 
-// const defaultMessage = [
-//   {
-//     entity: 'bot',
-//     message:
-//       'Hey there, you can try something like: "Give a summary of this document" or "What are the main points discussed in this document?"'
-//   }
-// ];
-
 const questionSuggestions = ['Give a summary of this document', 'What are the main points discussed in this document?'];
 
-const defaultMessage = [
-  {
-    entity: 'bot',
-    message: (
-      <Space direction="vertical">
-        {questionSuggestions.map((suggestion, index) => {
-          return (
-            <Button key={index} style={{ width: '100%' }}>
-              {suggestion}
-            </Button>
-          );
-        })}
-      </Space>
-    )
-  }
-];
+// const defaultMessage = [
+//   { entity: 'bot', message: 'Hey there, you can try these examples 😎' },
+//   {
+//     entity: 'bot',
+//     message: (
+//       <Space direction="vertical">
+//         {questionSuggestions.map((suggestion, index) => {
+//           return (
+//             <Button key={index} style={{ width: '100%' }} onClick={() => {}}>
+//               {suggestion}
+//             </Button>
+//           );
+//         })}
+//       </Space>
+//     )
+//   }
+// ];
 
 const ChatBox = () => {
   const { queryDocument } = useApi();
@@ -46,6 +39,32 @@ const ChatBox = () => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isAlert, setisAlert] = useState(false);
+
+  const defaultMessage = [
+    { entity: 'bot', message: 'Hello, feel free to check out these examples 😎.' },
+    {
+      entity: 'bot',
+      message: (
+        <Space direction="vertical">
+          {questionSuggestions.map((suggestion, index) => {
+            return (
+              <Button
+                key={index}
+                value={suggestion}
+                style={{ width: '100%' }}
+                onClick={() => {
+                  // console.log(suggestion);
+                  setInputValue(suggestion);
+                }}
+              >
+                {suggestion}
+              </Button>
+            );
+          })}
+        </Space>
+      )
+    }
+  ];
 
   const listRef = useRef();
   const messageInput = useRef();
