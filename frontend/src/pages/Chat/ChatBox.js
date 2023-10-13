@@ -1,9 +1,8 @@
 import React from 'react';
 import { useState, useEffect, useRef } from 'react';
-import { List, Input, Space, Button, Alert, Typography } from 'antd';
+import { List, Input, Space, Button, Alert, Typography, Card } from 'antd';
 import { useSelector } from 'react-redux';
 import miniLogo from 'assets/images/miniLogo.svg';
-import { Paper } from '@mui/material';
 import { UserOutlined } from '@ant-design/icons';
 import useApi from 'api/hooks/useApi';
 import './scrollBar.css';
@@ -58,22 +57,18 @@ const ChatBox = () => {
   }, [newMessage]);
 
   return (
-    <Paper
-      title={documentName}
-      style={{
-        padding: '1em',
-        height: '100%',
-        boxShadow: '0 0px 0px #333',
-        border: '1px #ededed solid'
-      }}
+    <Card
+      title={
+        <Title level={3} ellipsis>
+          {documentName}
+        </Title>
+      }
+      style={{ height: '100%' }}
     >
-      <Title level={6} ellipsis>
-        {documentName}
-      </Title>
-
       {isAlert && <Alert style={{ position: 'absolute' }} message="Please, Select a document!" type="error" />}
+
       <List
-        style={{ padding: '2em', overflowY: 'auto', height: '100%' }}
+        style={{ padding: '2em', overflowY: 'auto', height: '58vh' }}
         itemLayout="horizontal"
         className="custom-scrollbar"
         dataSource={messages.length > 0 ? messages : defaultMessage}
@@ -115,7 +110,7 @@ const ChatBox = () => {
           Send
         </Button>
       </Space.Compact>
-    </Paper>
+    </Card>
   );
 };
 
