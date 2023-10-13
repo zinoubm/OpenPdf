@@ -91,7 +91,7 @@ const ChatBox = () => {
 
       <List
         style={{ padding: '2em', overflowY: 'auto', height: '58vh' }}
-        itemLayout="horizontal"
+        itemLayout="vertical"
         className="custom-scrollbar"
         dataSource={messages.length > 0 ? messages : defaultMessage}
         ref={listRef}
@@ -115,7 +115,8 @@ const ChatBox = () => {
                 }}
               />
             )}
-            {messages.length > 0 ? <Markdown>{item.message}</Markdown> : item.message}
+            {console.log(item.message)}
+            {messages.length > 0 ? <Markdown>{item.message.trim()}</Markdown> : item.message}
           </List.Item>
         )}
       />

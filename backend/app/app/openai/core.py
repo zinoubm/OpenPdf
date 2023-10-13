@@ -19,9 +19,13 @@ def ask_stream(context, question, manager):
     Answer the following question according to the provided context. If the context doesn't contain the answer, Do Not Answer!
     If the context Is empty, Please Say No Context!
 
+    The answer has to be formated using the markdown format!
+
     context: {context}
 
     question: {question}
+
+    Use markdown Headings to add titles.
 
     answer:
     """
