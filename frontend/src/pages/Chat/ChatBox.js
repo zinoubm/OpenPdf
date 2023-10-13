@@ -6,7 +6,7 @@ import { UserOutlined } from '@ant-design/icons';
 
 import useApi from 'api/hooks/useApi';
 import { useSelector, useDispatch } from 'react-redux';
-import { updateMessages } from 'store/reducers/chat';
+import { updateIsLoading } from 'store/reducers/chat';
 
 import miniLogo from 'assets/images/miniLogo.svg';
 import './scrollBar.css';
@@ -17,20 +17,16 @@ const questionSuggestions = ['Give a summary of this document', 'What are the ma
 
 const ChatBox = () => {
   const { queryDocument } = useApi();
+  const dispatch = useDispatch();
 
-  // const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
+  const { messages, isLoading } = useSelector((state) => state.chat);
+  const { documentName, documentId } = useSelector((state) => state.app);
+
   const [inputValue, setInputValue] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [isAlert, setisAlert] = useState(false);
 
   const listRef = useRef();
   const messageInput = useRef();
-
-  const { messages } = useSelector((state) => state.chat);
-  const { documentName, documentId } = useSelector((state) => state.app);
-
-  const dispatch = useDispatch();
 
   const defaultMessage = [
     { entity: 'bot', message: 'Hello, feel free to check out these examples 😎.' },
@@ -45,7 +41,6 @@ const ChatBox = () => {
                 value={suggestion}
                 style={{ width: '100%' }}
                 onClick={() => {
-                  // console.log(suggestion);
                   setInputValue(suggestion);
                 }}
               >
@@ -58,19 +53,17 @@ const ChatBox = () => {
     }
   ];
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (documentId === null) {
       setisAlert(true);
       return;
     } else {
       setisAlert(false);
     }
-
-    setNewMessage(messageInput.current.input.value);
+    const currentMessage = messageInput.current.input.value;
+    dispatch(updateIsLoading({ isLoading: true }));
     setInputValue('');
-    setIsLoading(true);
-    // setMessages([...messages, { entity: 'user', message: messageInput.current.input.value }]);
-    dispatch(updateMessages({ messages: [...messages, { entity: 'user', message: messageInput.current.input.value }] }));
+    await queryDocument(currentMessage, documentId);
   };
 
   const handleInputChange = (e) => {
@@ -82,18 +75,6 @@ const ChatBox = () => {
       listRef.current.scrollTop = listRef.current.scrollHeight;
     }
   }, [messages]);
-
-  useEffect(() => {
-    queryDocument(
-      newMessage,
-      documentId,
-      messages,
-      (messages) => {
-        dispatch(updateMessages({ messages: messages }));
-      },
-      setIsLoading
-    );
-  }, [newMessage]);
 
   return (
     <Card

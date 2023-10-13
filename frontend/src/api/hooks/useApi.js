@@ -4,9 +4,14 @@ import useAuth from './useAuth';
 import { useNavigate } from 'react-router-dom';
 import successHandler from 'request/successHandler';
 
+import { useDispatch } from 'react-redux';
+
+import { updateMessages, updateIsLoading } from 'store/reducers/chat';
+
 const useApi = () => {
   const { getToken } = useAuth();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const currentUser = async () => {
     try {
@@ -86,7 +91,9 @@ const useApi = () => {
     }
   };
 
-  const queryDocument = async (query, document_id, messages, setMessages, setIsLoading) => {
+  const queryDocument = async (query, document_id) => {
+    dispatch(updateMessages({ messages: { entity: 'user', message: query }, accumulate: false }));
+
     const headers = {
       Accept: 'application/json',
       Authorization: 'Bearer ' + getToken()
@@ -116,7 +123,7 @@ const useApi = () => {
       let streamingDone = false;
       let accumulatedResponse = '';
 
-      setIsLoading(true);
+      dispatch(updateIsLoading({ isLoading: true }));
 
       while (!streamingDone) {
         const { done, value } = await reader.read();
@@ -126,14 +133,16 @@ const useApi = () => {
           break;
         }
         accumulatedResponse += decoder.decode(value);
-
-        setMessages([...messages, { entity: 'bot', message: accumulatedResponse }]);
+        dispatch(updateMessages({ messages: { entity: 'bot', message: accumulatedResponse }, accumulate: true }));
       }
-      setIsLoading(false);
+
+      dispatch(updateIsLoading({ isLoading: false }));
     } catch (err) {
       console.error('Error:', err);
       if (err.status === 403) navigate('/login');
       // return errorHandler(err, err.status);
+    } finally {
+      dispatch(updateIsLoading({ isLoading: false }));
     }
   };
 

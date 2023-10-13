@@ -4,8 +4,6 @@ import { createSlice } from '@reduxjs/toolkit';
 // initial state
 const initialState = {
   messages: [],
-  newMessage: '',
-  inputValue: '',
   isLoading: false,
   isAlert: false
 };
@@ -15,13 +13,16 @@ const chat = createSlice({
   initialState,
   reducers: {
     updateMessages: (state, action) => {
-      state.messages = action.payload.messages;
-    },
-    updateNewMessage: (state, action) => {
-      state.newMessage = action.payload.newMessage;
-    },
-    updateInputValue: (state, action) => {
-      state.inputValue = action.payload.inputValue;
+      if (action.payload.accumulate) {
+        const lastMessage = state.messages.pop();
+        if (lastMessage.entity === 'user') {
+          state.messages = [...state.messages, lastMessage, action.payload.messages];
+        } else {
+          state.messages = [...state.messages, action.payload.messages];
+        }
+      } else {
+        state.messages = [...state.messages, action.payload.messages];
+      }
     },
     updateIsLoading: (state, action) => {
       state.isLoading = action.payload.isLoading;
@@ -34,4 +35,4 @@ const chat = createSlice({
 
 export default chat.reducer;
 
-export const { updateMessages, updateNewMessage, updateInputValue, updateIsLoading, updateIsAlert } = chat.actions;
+export const { updateMessages, updateIsLoading, updateIsAlert } = chat.actions;
