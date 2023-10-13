@@ -1,12 +1,14 @@
 import React from 'react';
 import { useState, useEffect, useRef } from 'react';
-import { List, Input, Space, Button, Alert } from 'antd';
+import { List, Input, Space, Button, Alert, Typography } from 'antd';
 import { useSelector } from 'react-redux';
 import miniLogo from 'assets/images/miniLogo.svg';
-import { Paper, Typography } from '@mui/material';
+import { Paper } from '@mui/material';
 import { UserOutlined } from '@ant-design/icons';
 import useApi from 'api/hooks/useApi';
 import './scrollBar.css';
+
+const { Title } = Typography;
 
 const defaultMessage = [
   {
@@ -65,10 +67,13 @@ const ChatBox = () => {
         border: '1px #ededed solid'
       }}
     >
-      <Typography variant="h4">{documentName}</Typography>
+      <Title level={6} ellipsis>
+        {documentName}
+      </Title>
+
       {isAlert && <Alert style={{ position: 'absolute' }} message="Please, Select a document!" type="error" />}
       <List
-        style={{ padding: '2em', overflowY: 'auto', height: '85%' }}
+        style={{ padding: '2em', overflowY: 'auto', height: '100%' }}
         itemLayout="horizontal"
         className="custom-scrollbar"
         dataSource={messages.length > 0 ? messages : defaultMessage}
