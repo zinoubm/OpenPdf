@@ -25,6 +25,10 @@ from streaming_form_data.targets import FileTarget, ValueTarget
 from streaming_form_data.validators import MaxSizeValidator
 import streaming_form_data
 
+import boto3
+from botocore.exceptions import ClientError
+import os
+
 from .exeptions import MaxBodySizeException
 
 router = APIRouter()
@@ -102,9 +106,6 @@ class MaxBodySizeValidator:
             raise MaxBodySizeException(body_len=self.body_len)
 
 
-import time
-
-
 @router.post("/upsert-stream")
 async def upsert_stream(
     request: Request,
@@ -113,6 +114,11 @@ async def upsert_stream(
 ):
     body_validator = MaxBodySizeValidator(MAX_REQUEST_BODY_SIZE)
     filename = request.headers.get("Filename")
+
+    # document = crud.document.get(db=db, title=filename)
+
+    # if document and document.user_id == current_user.id and document.title == filename:
+    #     raise HTTPException(status_code=400, detail="document already exists")
 
     if not filename:
         raise HTTPException(
@@ -131,14 +137,42 @@ async def upsert_stream(
             body_validator(chunk)
             parser.data_received(chunk)
 
-        document_text = await get_document_from_file_stream(filepath)
+        session = boto3.Session(
+            aws_access_key_id=os.getenv("ACCESS_KEY_ID"),
+            aws_secret_access_key=os.getenv("SECRET_ACCESS_KEY"),
+            region_name=os.getenv("AWS_REGION"),
+        )
 
-        chunks = chunk_text(document_text, max_size=2000)
+        s3 = session.client("s3")
+
+        bucket_name = os.getenv("AWS_BUCKET_NAME")
 
         document_in = schemas.DocumentCreate(title=file_.multipart_filename)
         document = crud.document.create_with_user(
             db=db, obj_in=document_in, user_id=current_user.id
         )
+
+        # object_key = "documents" + "/" + file_.multipart_filename
+        object_key = (
+            "documents"
+            + "/"
+            + "doc"
+            + "-"
+            + str(document.id)
+            + "-"
+            + file_.multipart_filename
+        )
+
+        # Upload the file to S3
+        s3.upload_file(
+            filepath,
+            bucket_name,
+            object_key,
+            ExtraArgs={"ContentType": "application/pdf"},
+        )
+
+        document_text = await get_document_from_file_stream(filepath)
+        chunks = chunk_text(document_text, max_size=2000)
 
         ids = [uuid4().hex for chunk in chunks]
         payloads = [
@@ -207,6 +241,49 @@ def read_documents(
         )
 
     return documents
+
+
+@router.get("/document-url")
+def document_url(
+    document_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
+):
+    document = crud.document.get(db=db, id=document_id)
+
+    if not document:
+        raise HTTPException(status_code=404, detail="Document not found")
+    if document.user_id != current_user.id:
+        raise HTTPException(status_code=400, detail="Not enough permissions")
+
+    try:
+        session = boto3.Session(
+            aws_access_key_id=os.getenv("ACCESS_KEY_ID"),
+            aws_secret_access_key=os.getenv("SECRET_ACCESS_KEY"),
+            region_name=os.getenv("AWS_REGION"),
+        )
+        s3 = session.client("s3")
+
+        # object_key = "documents" + "/" + document.title
+        object_key = (
+            "documents" + "/" + "doc" + "-" + str(document.id) + "-" + document.title
+        )
+        print(object_key)
+
+        url = s3.generate_presigned_url(
+            ClientMethod="get_object",
+            Params={
+                "Bucket": os.getenv("AWS_BUCKET_NAME"),
+                "Key": object_key,
+            },
+            ExpiresIn=10000,
+        )
+
+    except ClientError:
+        print("couldn't get document url")
+        raise
+
+    return {"url": url}
 
 
 @router.post("/query")
@@ -297,6 +374,19 @@ def delete_document(
         raise HTTPException(status_code=400, detail="Not enough permissions")
     try:
         qdrant_manager.delete_points(user_id=current_user.id, document_id=id)
+        session = boto3.Session(
+            aws_access_key_id=os.getenv("ACCESS_KEY_ID"),
+            aws_secret_access_key=os.getenv("SECRET_ACCESS_KEY"),
+            region_name=os.getenv("AWS_REGION"),
+        )
+
+        bucket_name = os.getenv("AWS_BUCKET_NAME")
+        s3 = session.client("s3")
+
+        object_key = (
+            "documents" + "/" + "doc" + "-" + str(document.id) + "-" + document.title
+        )
+        s3.delete_object(Bucket=bucket_name, Key=object_key)
 
     except Exception as e:
         raise HTTPException(

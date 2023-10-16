@@ -1,14 +1,25 @@
 import React from 'react';
-import { Typography } from '@mui/material';
-import { Card } from 'antd';
+import useApi from 'api/hooks/useApi';
+import { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
 function DocumentPreview() {
-  return (
-    <Card style={{ height: '100%' }}>
-      <Typography variant="h4">Document Preview</Typography>
-      <Typography variant="p">Coming Soon</Typography>
-    </Card>
-  );
+  const { getDocumentUrl } = useApi();
+  const { documentId } = useSelector((state) => state.app);
+  const [documentUrl, setDocumentUrl] = useState('');
+
+  useEffect(() => {
+    const fetchUrl = async () => {
+      if (documentId) {
+        const url = await getDocumentUrl(documentId);
+        setDocumentUrl(url);
+      }
+    };
+
+    fetchUrl().catch(console.error);
+  }, [documentId]);
+
+  return <iframe style={{ border: 'none', borderRadius: '.8em' }} title="pdf" src={documentUrl} height="100%" width="100%"></iframe>;
 }
 
 export default DocumentPreview;

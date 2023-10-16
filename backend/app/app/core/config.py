@@ -31,6 +31,11 @@ class Settings(BaseSettings):
     POSTGRES_DB: str
     SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
 
+    ACCESS_KEY_ID: str
+    SECRET_ACCESS_KEY: str
+    AWS_REGION: str
+    AWS_BUCKET_NAME: str
+
     @validator("SQLALCHEMY_DATABASE_URI", pre=True)
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
         if isinstance(v, str):

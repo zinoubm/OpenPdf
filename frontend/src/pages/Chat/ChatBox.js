@@ -85,12 +85,11 @@ const ChatBox = () => {
           {documentName}
         </Title>
       }
-      style={{ height: '100%' }}
     >
       {isAlert && <Alert style={{ position: 'absolute' }} message="Please, Select a document!" type="error" />}
 
       <List
-        style={{ padding: '2em', overflowY: 'auto', height: '58vh' }}
+        style={{ padding: '2em', overflowY: 'auto', height: '65vh' }}
         itemLayout="vertical"
         className="custom-scrollbar"
         dataSource={messages.length > 0 ? messages : defaultMessage}
@@ -115,38 +114,10 @@ const ChatBox = () => {
                 }}
               />
             )}
-            {console.log(item.message)}
             {messages.length > 0 ? <Markdown>{item.message.trim()}</Markdown> : item.message}
           </List.Item>
         )}
       />
-
-      {/* <ul style={{ padding: '2em', overflowY: 'auto', height: '52vh' }} className="custom-scrollbar" ref={listRef}>
-        {(messages.length > 0 ? messages : defaultMessage).map((item, index) => (
-          <li key={index} style={{ padding: '1em' }}>
-            {item.entity === 'user' ? (
-              <UserOutlined
-                style={{
-                  marginRight: '1em',
-                  fontSize: '1.4em'
-                }}
-              />
-            ) : (
-              <img
-                src={miniLogo}
-                alt="entity"
-                style={{
-                  width: '1em',
-                  height: 'auto',
-                  marginRight: '1em'
-                }}
-              />
-            )}
-            {console.log(item.message)}
-            <Markdown>{item.message.toString()}</Markdown>
-          </li>
-        ))}
-      </ul> */}
 
       <Space.Compact style={{ height: '3em', width: '100%' }}>
         <Input

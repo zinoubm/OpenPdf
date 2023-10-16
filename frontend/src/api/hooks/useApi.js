@@ -91,6 +91,25 @@ const useApi = () => {
     }
   };
 
+  const getDocumentUrl = async (document_id) => {
+    try {
+      const response = await axios.get('/documents/document-url', {
+        params: {
+          document_id: document_id
+        },
+        headers: {
+          accept: 'application/json',
+          Authorization: 'Bearer ' + getToken()
+        }
+      });
+
+      return response.data.url;
+    } catch (err) {
+      if (err.response.status === 403) navigate('/login');
+      return errorHandler(err);
+    }
+  };
+
   const queryDocument = async (query, document_id) => {
     dispatch(updateMessages({ messages: { entity: 'user', message: query }, accumulate: false }));
 
@@ -162,7 +181,7 @@ const useApi = () => {
     }
   };
 
-  return { currentUser, uploadDocument, uploadDocumentStream, getDocuments, queryDocument, deleteDocument };
+  return { currentUser, uploadDocument, uploadDocumentStream, getDocuments, getDocumentUrl, queryDocument, deleteDocument };
 };
 
 export default useApi;
