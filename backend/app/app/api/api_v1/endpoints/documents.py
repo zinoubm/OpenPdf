@@ -19,6 +19,7 @@ from app.openai.core import ask, ask_stream
 from app.vectorstore.qdrant import qdrant_manager
 from app import crud, models, schemas
 from app.api import deps
+from app.core.config import settings
 
 from streaming_form_data import StreamingFormDataParser
 from streaming_form_data.targets import FileTarget, ValueTarget
@@ -29,7 +30,7 @@ import boto3
 from botocore.exceptions import ClientError
 import os
 
-from .exeptions import MaxBodySizeException
+from .exeptions import MaxBodySizeException, MaxBodySizeValidator
 
 router = APIRouter()
 
@@ -91,27 +92,15 @@ async def upsert_file(
 
 
 # Upload large documents
-MAX_FILE_SIZE = 1024 * 1024 * 1024 * 4  # = 4GB
-MAX_REQUEST_BODY_SIZE = MAX_FILE_SIZE + 1024
-
-
-class MaxBodySizeValidator:
-    def __init__(self, max_size: int):
-        self.body_len = 0
-        self.max_size = max_size
-
-    def __call__(self, chunk: bytes):
-        self.body_len += len(chunk)
-        if self.body_len > self.max_size:
-            raise MaxBodySizeException(body_len=self.body_len)
-
-
 @router.post("/upsert-stream")
 async def upsert_stream(
     request: Request,
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(deps.get_current_active_user),
 ):
+    MAX_REQUEST_BODY_SIZE = settings.MAX_REQUEST_BODY_SIZE
+    MAX_FILE_SIZE = settings.MAX_FILE_SIZE
+
     body_validator = MaxBodySizeValidator(MAX_REQUEST_BODY_SIZE)
     filename = request.headers.get("Filename")
 
@@ -152,7 +141,6 @@ async def upsert_stream(
             db=db, obj_in=document_in, user_id=current_user.id
         )
 
-        # object_key = "documents" + "/" + file_.multipart_filename
         object_key = (
             "documents"
             + "/"
@@ -215,6 +203,8 @@ async def upsert_stream(
         res = qdrant_manager.upsert_points(ids, payloads, embeddings)
 
     except Exception as e:
+        crud.document.remove(db=db, id=document.id)
+        qdrant_manager.delete_points(user_id=current_user.id, document_id=document.id)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Couldn't upload embeddings to the Vectorstore",
