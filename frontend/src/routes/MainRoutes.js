@@ -12,7 +12,7 @@ const MainRoutes = () => {
 
   return {
     path: '/',
-    element: getToken() ? <MainLayout /> : <Navigate to={'/login'} />,
+    element: getToken() ? <MainLayout /> : <Navigate to={'/home'} />,
     children: [
       {
         path: '/',

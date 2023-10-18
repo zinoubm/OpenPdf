@@ -3,7 +3,6 @@ import { Link as RouterLink } from 'react-router-dom';
 import useLogin from 'api/hooks/useLogin';
 import { Alert } from '@mui/material';
 
-// material-ui
 import {
   Button,
   Checkbox,
@@ -22,20 +21,14 @@ import {
 
 import { useState } from 'react';
 
-// third party
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 
-// project import
-// import FirebaseSocial from './FirebaseSocial';
 import AnimateButton from 'components/@extended/AnimateButton';
 
-// assets
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import { GoogleLogin } from '@react-oauth/google';
 import useGoogleLogin from 'api/hooks/useGoogleLogin';
-
-// ============================|| FIREBASE - LOGIN ||============================ //
 
 const AuthLogin = () => {
   const [checked, setChecked] = React.useState(false);

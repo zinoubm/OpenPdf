@@ -17,3 +17,6 @@ sudo docker-compose exec backend bash /app/tests-start.sh -x
 
 # this is a dummy comment
 # open source reference https://demo-erp-crm.idurarapp.com/
+
+info@salesforza.com
+rwLBFMNw84zzViB

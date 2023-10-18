@@ -258,7 +258,6 @@ def document_url(
         object_key = (
             "documents" + "/" + "doc" + "-" + str(document.id) + "-" + document.title
         )
-        print(object_key)
 
         url = s3.generate_presigned_url(
             ClientMethod="get_object",

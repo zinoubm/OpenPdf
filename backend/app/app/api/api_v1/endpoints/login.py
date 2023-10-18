@@ -69,7 +69,7 @@ def google_authentication(
         user_email = id_info["email"]
         user_full_name = id_info["name"]
 
-    except ValueError:
+    except ValueError as value_error:
         raise HTTPException(
             status_code=400,
             detail="Something went wrong with your Google Account, Please retry again!",
