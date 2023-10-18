@@ -1,10 +1,8 @@
-import { Box, Chip, useMediaQuery } from '@mui/material';
+import { Box, useMediaQuery } from '@mui/material';
 import Logo from 'components/Logo';
 import FileUploader from './FileUploader/index';
 import Profile from './Profile';
 import MobileSection from './MobileSection';
-
-// ==============================|| HEADER - CONTENT ||============================== //
 
 const HeaderContent = () => {
   const matchesXs = useMediaQuery((theme) => theme.breakpoints.down('md'));
@@ -14,7 +12,7 @@ const HeaderContent = () => {
       {/* {!matchesXs && <Search />} */}
       {/* {matchesXs && <Box sx={{ width: '100%', ml: 1 }} />} */}
       <Logo sx={{ marginLeft: '10px' }} />
-      <Chip
+      {/* <Chip
         label={process.env.REACT_APP_VERSION}
         size="small"
         sx={{ height: 16, marginLeft: '10px', '& .MuiChip-label': { fontSize: '0.625rem', py: 0.25 } }}
@@ -22,7 +20,7 @@ const HeaderContent = () => {
         href="#"
         target="_blank"
         clickable
-      />
+      /> */}
       <Box sx={{ width: '100%', ml: 1 }} />
 
       {/* <IconButton

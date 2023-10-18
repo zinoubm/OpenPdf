@@ -19,7 +19,7 @@ function DocumentPreview() {
     fetchUrl().catch(console.error);
   }, [documentId]);
 
-  return <iframe style={{ border: 'none', borderRadius: '.8em' }} title="pdf" src={documentUrl} height="100%" width="100%"></iframe>;
+  return <iframe style={{ border: 'none', borderRadius: '.8em' }} title="pdf" src={documentUrl} height="110%" width="100%"></iframe>;
 }
 
 export default DocumentPreview;

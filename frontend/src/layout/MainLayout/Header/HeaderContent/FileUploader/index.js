@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
+
 import { CloudUploadOutlined } from '@ant-design/icons';
 import useApi from 'api/hooks/useApi';
 import { useState } from 'react';
@@ -27,8 +28,7 @@ function FileUploader() {
       <LoadingButton
         size="large"
         variant="contained"
-        color="primary"
-        sx={{ color: 'black', borderRadius: '10px' }}
+        sx={{ color: 'black', borderRadius: '10px', background: 'transparent', border: 'solid 2px' }}
         endIcon={<CloudUploadOutlined />}
         component="label"
         loading={isLoading}

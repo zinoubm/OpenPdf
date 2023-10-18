@@ -108,7 +108,7 @@ const ChatBox = () => {
                 src={miniLogo}
                 alt="entity"
                 style={{
-                  width: '1em',
+                  width: '1.6em',
                   height: 'auto',
                   marginRight: '1em'
                 }}
