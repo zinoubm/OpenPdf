@@ -115,7 +115,7 @@ const Profile = () => {
         <Stack direction="row" spacing={2} alignItems="center" sx={{ p: 0.5 }}>
           <div
             style={{
-              backgroundColor: '#99DBF5',
+              backgroundColor: '#0a0a0a',
               width: '48px',
               height: '48px',
               borderRadius: '50%',
@@ -172,7 +172,7 @@ const Profile = () => {
                           <Stack direction="row" spacing={1.25} alignItems="center">
                             <div
                               style={{
-                                backgroundColor: '#99DBF5',
+                                backgroundColor: '#0a0a0a',
                                 width: '48px',
                                 height: '48px',
                                 borderRadius: '50%',

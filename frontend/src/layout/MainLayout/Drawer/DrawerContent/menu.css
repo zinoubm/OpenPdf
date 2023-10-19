@@ -1,0 +1,11 @@
+.menu-item {
+  /* Default styles for .menu-item */
+  color: white;
+  transition: color 0.3s; /* Add a smooth color transition effect */
+
+  /* Hover styles for .menu-item */
+}
+
+.menu-item:hover {
+  color: #5bacfc !important;
+}

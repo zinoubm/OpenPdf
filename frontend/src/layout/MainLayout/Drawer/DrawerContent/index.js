@@ -9,6 +9,8 @@ import useApi from 'api/hooks/useApi';
 import { useSelector, useDispatch } from 'react-redux';
 import { activeDocumentId, activeDocumentName, updateRefresKey } from 'store/reducers/app';
 
+import './menu.css';
+
 const DrawerContent = () => {
   const [documents, setDocuments] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -61,10 +63,17 @@ const DrawerContent = () => {
         }
       }}
     >
-      <Menu mode="inline">
+      <Menu mode="inline" style={{ color: 'white', backgroundColor: 'transparent' }}>
         <Menu.SubMenu key={'documents'} title={'Documents'} icon={<FilePdfOutlined />}>
           {documents.map((document) => (
-            <MenuItem key={document.id} documentId={document.id} title={document.title} onClick={handleSelectDocument}>
+            <MenuItem
+              className="menu-item"
+              // style={{ color: 'red' }}
+              key={document.id}
+              documentId={document.id}
+              title={document.title}
+              onClick={handleSelectDocument}
+            >
               {document.title}
             </MenuItem>
           ))}

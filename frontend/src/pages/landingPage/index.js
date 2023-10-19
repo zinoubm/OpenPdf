@@ -6,20 +6,23 @@ import Logo from 'assets/images/openpdfLogo.svg';
 
 const { Header } = Layout;
 
+import './style.css';
+
 function LandingPage() {
   return (
     <Box>
       <LandingPageBackground />
-      <Layout style={{ backgroundColor: 'transparent' }}>
+      <Layout className="hero-layout" style={{ backgroundColor: 'transparent' }}>
         <Header
+          className="hero-header"
           style={{ height: '12vh', backgroundColor: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
         >
-          <img src={Logo} style={{ width: '10em' }} alt="OpenPdf" />
-          <div style={{ width: '20%' }}>
-            <Button style={{ marginRight: '1em' }} type="text" href="#">
+          <img className="hero-logo" src={Logo} style={{ width: '10em' }} alt="OpenPdf" />
+          <div className="hero-buttons-container" style={{ width: '20%' }}>
+            <Button className="hero-about-button" style={{ marginRight: '1em' }} type="text" href="#">
               About
             </Button>
-            <Button href="/login" style={{ backgroundColor: 'transparent', border: 'solid 1px black' }}>
+            <Button className="hero-cta-button" href="/login" style={{ backgroundColor: 'transparent', border: 'solid 1px black' }}>
               Get Started
             </Button>
           </div>

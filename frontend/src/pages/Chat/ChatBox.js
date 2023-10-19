@@ -127,7 +127,7 @@ const ChatBox = () => {
           placeholder="Ask a question"
           ref={messageInput}
         />
-        <Button loading={isLoading} style={{ background: '#FEC61E', height: '100%' }} type="primary" onClick={handleSubmit}>
+        <Button loading={isLoading} style={{ background: '#0a0a0a', height: '100%' }} type="primary" onClick={handleSubmit}>
           Send
         </Button>
       </Space.Compact>
