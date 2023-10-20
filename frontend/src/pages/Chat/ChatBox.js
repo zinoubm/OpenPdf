@@ -41,7 +41,7 @@ const ChatBox = () => {
               <Button
                 key={index}
                 value={suggestion}
-                style={{ width: '100%' }}
+                style={{ width: '100%', border: '1px black solid' }}
                 onClick={() => {
                   setInputValue(suggestion);
                 }}
