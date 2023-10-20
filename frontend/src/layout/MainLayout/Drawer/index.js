@@ -43,11 +43,8 @@ const MainDrawer = ({ open, handleDrawerToggle, window }) => {
             '& .MuiDrawer-paper': {
               boxSizing: 'border-box',
               width: drawerWidth,
-              // borderRight: `1px solid ${theme.palette.divider}`,
               backgroundImage: 'none',
-              boxShadow: 'inherit',
-              color: 'white',
-              backgroundColor: '#0a0a0a'
+              boxShadow: 'inherit'
             }
           }}
         >
