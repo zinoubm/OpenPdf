@@ -91,6 +91,7 @@ async def upsert_file(
     return UpsertResponse(id=document.id)
 
 
+# celery
 # Upload large documents
 @router.post("/upsert-stream")
 async def upsert_stream(
