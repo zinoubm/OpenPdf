@@ -24,30 +24,19 @@ function LandingPage() {
             </Button>
           </div>
         </Header>
-        <div
-          className="hero-container"
-          // style={{ background: 'red' }}
-        >
-          <div
-            className="typography-container"
-            //  style={{ width: '50%', height: '100vh', padding: '4em' }}
-          >
+        <div className="hero-container">
+          <div className="typography-container">
             <Typography style={{ fontFamily: 'DM Serif Display, serif', fontSize: '4em', width: '75%' }}>
               Chat With Your Documents! No Hustle.
             </Typography>
             <Typography>Use AI and ask questions from your PDFs.</Typography>
-            <Button
-              href="/login"
-              className="hero-cta-button"
-              // style={{ backgroundColor: 'transparent', border: 'solid 1px black', marginTop: '1em', marginRight: '.6em' }}
-            >
+            <Button href="/login" className="hero-cta-button">
               Get Started For Free
             </Button>
             <Button href="#" style={{ backgroundColor: 'transparent', border: 'solid 1px black', marginTop: '1em' }}>
               Join Our Group Chat
             </Button>
           </div>
-          {/* <div style={{ width: '50%', height: '100vh' }}>-</div> */}
         </div>
       </Layout>
     </Box>
