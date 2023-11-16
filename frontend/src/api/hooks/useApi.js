@@ -62,7 +62,7 @@ const useApi = () => {
           'Content-Type': 'multipart/form-data',
           Filename: file.name
         },
-        timeout: 200 * 1000 // 200 seconds
+        timeout: 2000 * 1000 // 200 seconds
       });
 
       return successHandler(response, { notifyOnSuccess: true });
