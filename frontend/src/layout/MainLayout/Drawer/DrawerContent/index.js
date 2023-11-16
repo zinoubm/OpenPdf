@@ -68,7 +68,6 @@ const DrawerContent = () => {
           {documents.map((document) => (
             <MenuItem
               className="menu-item"
-              // style={{ color: 'red' }}
               key={document.id}
               documentId={document.id}
               title={document.title}

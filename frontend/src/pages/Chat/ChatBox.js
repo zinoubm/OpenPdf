@@ -31,7 +31,7 @@ const ChatBox = () => {
   const messageInput = useRef();
 
   const defaultMessage = [
-    { entity: 'bot', message: 'Hello, feel free to check out these examples 😎.' },
+    { entity: 'bot', message: 'Hello, feel free to check out these examples.' },
     {
       entity: 'bot',
       message: (

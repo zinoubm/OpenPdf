@@ -1,36 +1,18 @@
 import PropTypes from 'prop-types';
 import { useRef, useState, useEffect } from 'react';
 import useAuth from 'api/hooks/useAuth';
-// import useCurrentUser from 'api/hooks/useCurrentUser';
 import useApi from 'api/hooks/useApi';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { activeUserEmail, activeUserFullName } from 'store/reducers/auth';
 
-// material-ui
 import { useTheme } from '@mui/material/styles';
-import {
-  // Avatar,
-  Box,
-  ButtonBase,
-  CardContent,
-  ClickAwayListener,
-  Grid,
-  IconButton,
-  Paper,
-  Popper,
-  Stack,
-  // Tab,
-  // Tabs,
-  Typography
-} from '@mui/material';
+import { Box, ButtonBase, CardContent, ClickAwayListener, Grid, IconButton, Paper, Popper, Stack, Typography } from '@mui/material';
 
-// project import
 import MainCard from 'components/MainCard';
 import Transitions from 'components/@extended/Transitions';
 import { LogoutOutlined } from '@ant-design/icons';
 
-// tab panel wrapper
 function TabPanel({ children, value, index, ...other }) {
   return (
     <div role="tabpanel" hidden={value !== index} id={`profile-tabpanel-${index}`} aria-labelledby={`profile-tab-${index}`} {...other}>
@@ -45,22 +27,12 @@ TabPanel.propTypes = {
   value: PropTypes.any.isRequired
 };
 
-// function a11yProps(index) {
-//   return {
-//     id: `profile-tab-${index}`,
-//     'aria-controls': `profile-tabpanel-${index}`
-//   };
-// }
-
-// ==============================|| HEADER CONTENT - PROFILE ||============================== //
-
 const Profile = () => {
   const theme = useTheme();
   const { userFullName, userEmail } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   const { deleteToken } = useAuth();
-  // const currentUser = useCurrentUser();
   const { currentUser } = useApi();
 
   const handleLogout = async () => {

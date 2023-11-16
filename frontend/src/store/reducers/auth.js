@@ -1,10 +1,8 @@
-// types
 import { createSlice } from '@reduxjs/toolkit';
 
-// initial state
 const initialState = {
-  userFullName: 'Test User',
-  userEmail: 'user@test.com'
+  userFullName: ' ',
+  userEmail: ' '
 };
 
 const auth = createSlice({
