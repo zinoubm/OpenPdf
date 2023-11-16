@@ -210,7 +210,8 @@ async def upsert_stream(
             detail="Couldn't upload embeddings to the Vectorstore",
         )
 
-    return {"message": f"Successfuly uploaded {filename}"}
+    # return {"message": f"Successfuly uploaded {filename}"}
+    return {"document_id": document.id, "document_title": file_.multipart_filename}
 
 
 @router.get("/", response_model=List[schemas.Document])
