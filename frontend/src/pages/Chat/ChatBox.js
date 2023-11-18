@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-  useState,
-  //  useEffect,
-  useRef
-} from 'react';
+import { useState, useRef } from 'react';
 
 import { List, Input, Space, Button, Alert, Typography, Card } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
@@ -31,7 +27,6 @@ const ChatBox = () => {
   const [inputValue, setInputValue] = useState('');
   const [isAlert, setisAlert] = useState(false);
 
-  // const listRef = useRef();
   const messageInput = useRef();
 
   const defaultMessage = [
@@ -76,12 +71,6 @@ const ChatBox = () => {
     setInputValue(e.target.value);
   };
 
-  // useEffect(() => {
-  //   if (listRef.current) {
-  //     listRef.current.scrollTop = listRef.current.scrollHeight;
-  //   }
-  // }, [messages]);
-
   return (
     <Card
       title={
@@ -97,7 +86,6 @@ const ChatBox = () => {
         itemLayout="vertical"
         className="custom-scrollbar"
         dataSource={messages.length > 0 ? messages : defaultMessage}
-        // ref={listRef}
         renderItem={(item) => (
           <List.Item style={{ padding: '1em' }}>
             {item.entity === 'user' ? (
