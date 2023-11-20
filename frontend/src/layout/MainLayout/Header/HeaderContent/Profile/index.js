@@ -168,7 +168,7 @@ const Profile = () => {
                         </Grid>
                         <Grid item>
                           <IconButton size="large" color="secondary" onClick={handleLogout}>
-                            <LogoutOutlined /> <Typography sx={{ marginLeft: '0.2em' }}>Logout</Typography>
+                            <LogoutOutlined style={{ marginRight: '0.2em' }} /> <Typography>Logout</Typography>
                           </IconButton>
                         </Grid>
                       </Grid>
