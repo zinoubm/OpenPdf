@@ -51,6 +51,14 @@ def get_current_active_user(
     return current_user
 
 
+def get_current_verified_user(
+    current_user: models.User = Depends(get_current_user),
+) -> models.User:
+    if not crud.user.is_verified(current_user):
+        raise HTTPException(status_code=400, detail="Unverified user")
+    return current_user
+
+
 def get_current_active_superuser(
     current_user: models.User = Depends(get_current_user),
 ) -> models.User:

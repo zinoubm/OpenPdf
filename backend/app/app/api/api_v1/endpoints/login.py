@@ -148,3 +148,5 @@ def reset_password(
     db.add(user)
     db.commit()
     return {"msg": "Password updated successfully"}
+
+

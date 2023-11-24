@@ -12,7 +12,7 @@ sudo docker-compose exec backend bash /app/tests-start.sh -x
 
 # react test user
 "password": "12341234",
-"email": "lolo@example.com",
+"email": "test@example.com",
 "full_name": "string"
 
 # this is a dummy comment
