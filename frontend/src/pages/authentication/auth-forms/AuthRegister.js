@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Alert } from '@mui/material';
 import useRegister from 'api/hooks/useRegister';
+import { useNavigate } from 'react-router-dom';
 
 import { GoogleLogin } from '@react-oauth/google';
 
@@ -36,6 +37,8 @@ import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 
 const AuthRegister = () => {
   const [level, setLevel] = useState();
+  const navigate = useNavigate();
+
   const [showPassword, setShowPassword] = useState(false);
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -227,6 +230,7 @@ const AuthRegister = () => {
                     onClick={() => {
                       register(values.email, values.password, values.firstname + ' ' + values.lastname);
                       setregisterSuccess(true);
+                      navigate('/verify');
                     }}
                     disableElevation
                     disabled={isSubmitting}

@@ -48,6 +48,15 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     def is_active(self, user: User) -> bool:
         return user.is_active
 
+    def is_verified(self, user: User) -> bool:
+        return user.is_verified
+
+    def verify(self, db: Session, user: User):
+        user.is_verified = True
+        db.add(user)
+        db.commit()
+        return user
+
     def is_superuser(self, user: User) -> bool:
         return user.is_superuser
 

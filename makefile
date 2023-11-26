@@ -15,6 +15,11 @@ sudo docker-compose exec backend bash /app/tests-start.sh -x
 "email": "test@example.com",
 "full_name": "string"
 
+# non verified test user
+"password": "12341234",
+"email": "nonverified@example.com",
+"full_name": "non verified"
+
 # this is a dummy comment
 # open source reference https://demo-erp-crm.idurarapp.com/
 

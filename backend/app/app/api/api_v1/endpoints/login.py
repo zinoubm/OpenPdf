@@ -83,6 +83,8 @@ def google_authentication(
         )
         user = crud.user.create(db, obj_in=user_in)
 
+    user = crud.user.verify(db, user)
+
     if not crud.user.is_active(user):
         raise HTTPException(status_code=400, detail="Inactive user")
 
@@ -148,5 +150,3 @@ def reset_password(
     db.add(user)
     db.commit()
     return {"msg": "Password updated successfully"}
-
-

@@ -1,5 +1,5 @@
 const openpdfLightColors = {
-  primaryColor: ['#896a0b', '#a17c0d', '#ba8f0e', '#d2a10f', '#eab410', '#fec61e', '#f2c53b', '#f4cc53', '#f6d36a', '#f8db82'],
+  primaryColor: ['#105cff', '#105cff', '#105cff', '#105cff', '#105cff', '#105cff', '#105cff', '#105cff', '#105cff', '#105cff'],
   orangeAccentColor: ['#7c3d03', '#964903', '#af5604', '#c86204', '#e26e03', '#fc7a03', '#fd871c', '#fd9535', '#fea24d', '#ffaf66'],
   blueAccentColor: ['#1babe4', '#31b4e7', '#47bceb', '#5ec5ee', '#75cdf0', '#8bd6f3', '#a2def6', '#b9e6f8', '#d0effb', '#e8f7fd'],
   cyanAccentColor: ['#19e6cc', '#2fe9d2', '#46ecd7', '#5cefdd', '#73f2e2', '#8af4e7', '#a1f7ec', '#b9f9f1', '#d0fbf6', '#e7fdfa'],

@@ -8,6 +8,7 @@ import MinimalLayout from 'layout/MinimalLayout';
 const AuthLogin = Loadable(lazy(() => import('pages/authentication/Login')));
 const AuthRegister = Loadable(lazy(() => import('pages/authentication/Register')));
 import LandingPage from 'pages/landingPage/index';
+import VerifyEmail from 'pages/verify/index';
 
 // ==============================|| AUTH ROUTING ||============================== //
 
@@ -26,6 +27,10 @@ const LoginRoutes = {
     {
       path: 'home',
       element: <LandingPage />
+    },
+    {
+      path: 'verify',
+      element: <VerifyEmail />
     }
   ]
 };
