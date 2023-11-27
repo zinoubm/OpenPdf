@@ -9,15 +9,15 @@ function VerifyEmail() {
 
   return (
     <Space className="verification-container">
-      <div className="message">We sent you an Email, Please check your inbox and verify It.</div>
-      <button
+      <div className="message">We sent you a Verification Email, Please check your inbox.</div>
+      {/* <button
         className="resend-button"
         onClick={() => {
           console.log('Sending verification Email...');
         }}
       >
         Resend Email Verification
-      </button>
+      </button> */}
       <button
         className="resend-button"
         onClick={() => {

@@ -2,6 +2,8 @@ from typing import Any, List
 
 from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
+from fastapi.responses import HTMLResponse
+
 from pydantic.networks import EmailStr
 from sqlalchemy.orm import Session
 
@@ -170,7 +172,22 @@ def verify_user(
     user.is_verified = True
     db.add(user)
     db.commit()
-    return {"msg": "User Verified successfully"}
+
+    html_content = """
+        <html>
+        <head>
+            <title>Email Verified</title>
+        </head>
+        <body>
+            <h1>Email verified successfully!</h1>
+            <p>Your email has been successfully verified, you can close this window.</p>
+            <!-- You can include additional content or UI elements here -->
+        </body>
+        </html>
+    """
+
+    return HTMLResponse(content=html_content, status_code=200)
+
 
 
 @router.get("/{user_id}", response_model=schemas.User)

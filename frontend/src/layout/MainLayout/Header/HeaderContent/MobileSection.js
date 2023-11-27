@@ -12,6 +12,7 @@ import Transitions from 'components/@extended/Transitions';
 // assets
 import { MoreOutlined } from '@ant-design/icons';
 import FileUploader from './FileUploader/index';
+import Upgrade from './Upgrade/index';
 
 // ==============================|| HEADER CONTENT - MOBILE ||============================== //
 
@@ -87,7 +88,7 @@ const MobileSection = () => {
               <ClickAwayListener onClickAway={handleClose}>
                 <AppBar color="inherit">
                   <Toolbar>
-                    {/* <Search /> */}
+                    <Upgrade />
                     <FileUploader />
                     <Profile />
                   </Toolbar>
