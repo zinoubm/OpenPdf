@@ -4,7 +4,7 @@ import useAuth from 'api/hooks/useAuth';
 import useApi from 'api/hooks/useApi';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { activeUserEmail, activeUserFullName } from 'store/reducers/auth';
+import { activeUserEmail, activeUserFullName, activeUserId } from 'store/reducers/auth';
 
 import { useTheme } from '@mui/material/styles';
 import { Box, ButtonBase, CardContent, ClickAwayListener, Grid, IconButton, Paper, Popper, Stack, Typography } from '@mui/material';
@@ -59,9 +59,11 @@ const Profile = () => {
   useEffect(() => {
     const getCurrentUser = async (dispatch) => {
       const response = await currentUser();
+      console.log('Response after login:', response);
       if (response.success) {
         dispatch(activeUserEmail({ userEmail: response.data.email }));
         dispatch(activeUserFullName({ userFullName: response.data.full_name }));
+        dispatch(activeUserId({ userId: response.data.id }));
       }
     };
     getCurrentUser(dispatch);
