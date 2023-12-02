@@ -24,6 +24,9 @@ const chat = createSlice({
         state.messages = [...state.messages, action.payload.messages];
       }
     },
+    resetMessages: (state) => {
+      state.messages = [];
+    },
     updateIsLoading: (state, action) => {
       state.isLoading = action.payload.isLoading;
     },
@@ -35,4 +38,4 @@ const chat = createSlice({
 
 export default chat.reducer;
 
-export const { updateMessages, updateIsLoading, updateIsAlert } = chat.actions;
+export const { updateMessages, updateIsLoading, updateIsAlert, resetMessages } = chat.actions;

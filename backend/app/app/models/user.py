@@ -19,3 +19,5 @@ class User(Base):
     is_active: bool = Column(Boolean(), default=True)
     is_superuser: bool = Column(Boolean(), default=False)
     documents: Mapped["Document"] = relationship("Document", back_populates="user")
+    uploads_counter = Column(Integer, default=0, nullable=False)
+    queries_counter = Column(Integer, default=0, nullable=False) 

@@ -3,9 +3,8 @@ import axios from '../axios';
 import useAuth from './useAuth';
 import { useNavigate } from 'react-router-dom';
 import successHandler from 'request/successHandler';
-
+import { notification } from 'antd';
 import { useDispatch } from 'react-redux';
-
 import { updateMessages, updateIsLoading } from 'store/reducers/chat';
 
 const useApi = () => {
@@ -21,10 +20,39 @@ const useApi = () => {
           Authorization: 'Bearer ' + getToken()
         }
       });
-
       return successHandler(response);
     } catch (err) {
       if (err.response.status === 403) navigate('/login');
+      return errorHandler(err);
+    }
+  };
+
+  const getPaymentSummary = async () => {
+    try {
+      const response = await axios.get('/stripe/summary', {
+        headers: {
+          accept: 'application/json',
+          Authorization: 'Bearer ' + getToken()
+        }
+      });
+
+      return successHandler(response);
+    } catch (err) {
+      return errorHandler(err);
+    }
+  };
+
+  const getCustomerPortalUrl = async () => {
+    try {
+      const response = await axios.get('/stripe/customer-portal', {
+        headers: {
+          accept: 'application/json',
+          Authorization: 'Bearer ' + getToken()
+        }
+      });
+
+      return response.data.url;
+    } catch (err) {
       return errorHandler(err);
     }
   };
@@ -45,6 +73,16 @@ const useApi = () => {
       return successHandler(response, { notifyOnSuccess: true });
     } catch (err) {
       if (err.response.status === 403) navigate('/login');
+      if (err.status === 402) {
+        notification.config({
+          duration: 10
+        });
+        notification.info({
+          message: `Plan Limits Reached.`,
+          description: 'You reached your subscription limits, Please Upgrade to get more quotas.',
+          placement: 'bottomRight'
+        });
+      }
       return errorHandler(err);
     }
   };
@@ -68,6 +106,16 @@ const useApi = () => {
       return successHandler(response, { notifyOnSuccess: true });
     } catch (err) {
       if (err.response.status === 403) navigate('/login');
+      if (err.status === 402) {
+        notification.config({
+          duration: 10
+        });
+        notification.info({
+          message: `Plan Limits Reached.`,
+          description: 'You reached your subscription limits, Please Upgrade to get more quotas.',
+          placement: 'bottomRight'
+        });
+      }
       return errorHandler(err);
     }
   };
@@ -159,7 +207,16 @@ const useApi = () => {
     } catch (err) {
       console.error('Error:', err);
       if (err.status === 403) navigate('/login');
-      // return errorHandler(err, err.status);
+      if (err.status === 402) {
+        notification.config({
+          duration: 10
+        });
+        notification.info({
+          message: `Plan Limits Reached.`,
+          description: 'You reached your subscription limits, Please Upgrade to get more quotas.',
+          placement: 'bottomRight'
+        });
+      }
     } finally {
       dispatch(updateIsLoading({ isLoading: false }));
     }
@@ -181,7 +238,17 @@ const useApi = () => {
     }
   };
 
-  return { currentUser, uploadDocument, uploadDocumentStream, getDocuments, getDocumentUrl, queryDocument, deleteDocument };
+  return {
+    currentUser,
+    getPaymentSummary,
+    getCustomerPortalUrl,
+    uploadDocument,
+    uploadDocumentStream,
+    getDocuments,
+    getDocumentUrl,
+    queryDocument,
+    deleteDocument
+  };
 };
 
 export default useApi;

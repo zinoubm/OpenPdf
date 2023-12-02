@@ -7,6 +7,8 @@ from app.crud.base import CRUDBase
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
 
+from app.core.constants import FEATURES_ENUM
+
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     def get_by_email(self, db: Session, *, email: str) -> Optional[User]:
@@ -59,6 +61,47 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
 
     def is_superuser(self, user: User) -> bool:
         return user.is_superuser
+
+    def get_usage(self, db: Session, user_id):
+        user = self.get(db=db, id=user_id)
+        return {
+            FEATURES_ENUM.UPLOADS: user.uploads_counter,
+            FEATURES_ENUM.QUERIES: user.queries_counter,
+        }
+
+    def increment_usage(self, db: Session, user_id, feature, amount=1):
+        user = self.get(db=db, id=user_id)
+
+        if feature == FEATURES_ENUM.UPLOADS:
+            user.uploads_counter += amount
+            db.add(user)
+            db.commit()
+
+            return user
+
+        if feature == FEATURES_ENUM.QUERIES:
+            user.queries_counter += amount
+            db.add(user)
+            db.commit()
+
+            return user
+
+        raise Exception("Non valid feature")
+
+    def reset_usage(self, db: Session, user_id):
+        user = self.get(db=db, id=user_id)
+        user.uploads_counter = 0
+        user.queries_counter = 0
+        db.add(user)
+        db.commit()
+
+        return user
+
+    def reset_usage_all(self, db: Session):
+        db.query(User).update({User.uploads_counter: 0, User.queries_counter: 0})
+        db.commit()
+
+        return True
 
 
 user = CRUDUser(User)

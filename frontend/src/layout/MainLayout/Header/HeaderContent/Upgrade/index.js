@@ -1,11 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Modal, Box } from '@mui/material';
+import useApi from 'api/hooks/useApi';
+import { useSelector, useDispatch } from 'react-redux';
+import { activePaymentSummary } from 'store/reducers/app';
 
 import StripePricingTable from './StripePricingTable';
 import './StripePricingTable.css';
 
 function Upgrade() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { getPaymentSummary, getCustomerPortalUrl } = useApi();
+  const { paymentSummary } = useSelector((state) => state.app);
+
+  const dispatch = useDispatch();
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -20,30 +27,64 @@ function Upgrade() {
     width: '80%',
     height: '90%',
     overflowY: 'scroll',
-    bgcolor: '#387aff',
+    bgcolor: '#f5f9ff',
     boxShadow: 24,
     padding: '1em'
   };
 
   const handleClose = () => setIsModalOpen(false);
 
+  const handleGetRedirectUrl = async () => {
+    const url = await getCustomerPortalUrl();
+    window.location.href = url;
+  };
+
+  useEffect(() => {
+    const getPaymentSummaryRequest = async (dispatch) => {
+      const response = await getPaymentSummary();
+      if (response.success) {
+        dispatch(activePaymentSummary({ paymentSummary: response.data }));
+      }
+    };
+
+    getPaymentSummaryRequest(dispatch);
+  }, []);
+
   return (
     <>
-      <Button
-        variant="contained"
-        style={{
-          color: 'white',
-          borderRadius: '10px',
-          background: 'black',
-          border: 'solid 2px',
-          marginRight: '.6em',
-          paddingLeft: '2em',
-          paddingRight: '2em'
-        }}
-        onClick={showModal}
-      >
-        Upgrade
-      </Button>
+      {!paymentSummary || paymentSummary.plan === 'FREE' ? (
+        <Button
+          variant="contained"
+          style={{
+            color: 'white',
+            borderRadius: '10px',
+            background: 'black',
+            border: 'solid 2px',
+            marginRight: '.6em',
+            paddingLeft: '2em',
+            paddingRight: '2em'
+          }}
+          onClick={showModal}
+        >
+          Upgrade
+        </Button>
+      ) : (
+        <Button
+          variant="contained"
+          style={{
+            color: 'white',
+            borderRadius: '10px',
+            border: 'solid 2px',
+            background: '#0ec295',
+            marginRight: '.6em',
+            paddingLeft: '2em',
+            paddingRight: '2em'
+          }}
+          onClick={handleGetRedirectUrl}
+        >
+          Manage
+        </Button>
+      )}
 
       <Modal open={isModalOpen} onClose={handleClose}>
         <Box className="custom-scrollbar" sx={style}>

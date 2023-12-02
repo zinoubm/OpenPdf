@@ -1,27 +1,37 @@
-.hero-container {
+.section {
+  margin-bottom: 4em;
+}
+
+/* * {
+  border: 1px red solid;
+} */
+
+.center {
   display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-background {
+  width: 100%;
+  filter: blur(40%);
+  overflow: hidden;
 }
 
 .hero-header {
-  height: 12vh;
-  background-color: transparent;
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  padding: 1em 4em;
 }
 
 .hero-logo {
   width: 10em;
 }
 
-.typography-container {
-  width: 50%;
-  height: 100vh;
-  padding: 4em;
-}
-
-.hero-buttons-container {
-  width: 20%;
+.hero-header-buttons-container {
+  /* border: 1px solid red; */
 }
 
 .hero-about-button {
@@ -31,48 +41,178 @@
 .hero-cta-button {
   background-color: black;
   color: white;
-  margin-right: 0.6em;
-  border: black;
 }
 
-@media (max-width: 1020px) {
-  .hero-buttons-container {
-    width: 20%;
-  }
-  .typography-container {
-    width: 70%;
+.hero-section {
+  display: flex;
+}
+
+.hero-typography-container {
+  width: 65%;
+  padding: 4em;
+}
+
+.hero-typography-header {
+  font-size: 4.2em;
+}
+
+.hero-typography-description {
+  font-size: 1.4em;
+  width: 60%;
+  margin-bottom: 2em;
+}
+
+.hero-image {
+  width: 95%;
+  padding: 4em;
+}
+
+.typography-section {
+  display: flex;
+  flex-direction: row;
+  padding: 1em 8em;
+}
+
+.typography-section-text {
+  width: 50%;
+}
+
+.typography-section-text-header {
+  font-size: 3.4em;
+  margin-bottom: 0.4em;
+}
+
+.typography-section-text-description {
+  font-size: 1.2em;
+}
+
+.typography-section-image {
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1em;
+}
+
+.typography-section-image-image {
+  width: 60%;
+}
+
+.typography-header {
+  font-size: 3.6em;
+}
+
+.features-cards-section {
+  display: flex;
+  padding: 0 26%;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.feature-card {
+  padding: 1.6em;
+  padding-top: 2.8em;
+  margin: 1em;
+  width: 20em;
+  border: 2.6px black solid;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 28em;
+}
+
+.feature-card-typography {
+  height: 80%;
+}
+
+.feature-card-typography-description {
+  margin-top: 1em;
+  font-size: 1.1em;
+}
+
+@media (max-width: 1220px) {
+  .hero-typography-header {
+    font-size: 2.4em;
   }
 
-  .hero-about-button {
+  .hero-typography-container {
+    width: 80%;
+    padding: 2.4;
+  }
+
+  .hero-typography-description {
+    font-size: 1em;
+    margin-bottom: 2em;
+  }
+
+  .hero-image {
     display: none;
   }
-  .hero-container {
-    display: flex;
-    flex-direction: column;
+
+  .typography-section {
+    padding: 1em 4em;
+  }
+
+  .typography-section-text-header {
+    font-size: 1.8em;
+    margin-bottom: 0.4em;
+  }
+
+  .typography-section-text-description {
+    font-size: 1em;
+  }
+
+  .typography-section-image-image {
+    width: 74%;
+  }
+
+  .features-cards-section {
+    padding: 0 15%;
   }
 }
 
 @media (max-width: 767px) {
-  .hero-floating {
-    display: none;
+  .section {
+    margin-bottom: 2em;
   }
 
-  .hero-background {
-    top: -4em !important;
+  .hero-header {
+    padding: 1em 0.8em;
   }
 
-  .typography-container {
+  .hero-logo {
+    width: 6em;
+  }
+
+  .hero-section {
+    flex-direction: column;
+  }
+
+  .hero-typography-container {
+    width: 100%;
+    padding: 1.4em;
+  }
+
+  .hero-image {
+    width: 100%;
+    padding: 1em;
+  }
+
+  .typography-section {
+    flex-direction: column;
+    padding: 2em 3.2em;
+  }
+
+  .typography-section-text {
     width: 100%;
   }
-  .hero-buttons-container {
-    width: 20%;
-  }
 
-  .hero-about-button {
+  .typography-section-image {
     display: none;
   }
-  .hero-container {
-    display: flex;
+
+  .features-cards-section {
     flex-direction: column;
   }
 }

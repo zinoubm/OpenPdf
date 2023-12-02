@@ -17,15 +17,28 @@ function FileUploader() {
 
   const handleUpload = async ({ target }) => {
     setIsLoading(true);
-    const response = await uploadDocumentStream(target.files[0]);
-    console.log('Upload Document Response', response);
-    setIsLoading(false);
+    try {
+      const response = await uploadDocumentStream(target.files[0]);
 
-    dispatch(activeDocumentId({ documentId: response.data.document_id }));
-    dispatch(activeDocumentName({ documentName: response.data.document_title }));
-    dispatch(activeSelectedKeys({ selectedKeys: null }));
-
-    dispatch(updateRefresKey());
+      dispatch(activeDocumentId({ documentId: response.data.document_id }));
+      dispatch(activeDocumentName({ documentName: response.data.document_title }));
+      dispatch(activeSelectedKeys({ selectedKeys: null }));
+      dispatch(updateRefresKey());
+    } catch (error) {
+      // console.error('Error occurred during upload:', error);
+      if (error.status === 402) {
+        notification.config({
+          duration: 10
+        });
+        notification.info({
+          message: `Plan Limits Reached.`,
+          description: 'You reached your subscription limits, Please Upgrade to get more quotas.',
+          placement: 'bottomRight'
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

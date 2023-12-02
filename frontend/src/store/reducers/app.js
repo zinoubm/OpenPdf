@@ -4,7 +4,8 @@ const initialState = {
   documentId: null,
   documentName: 'Please select a document.',
   refreshKey: 0,
-  selectedKeys: null
+  selectedKeys: null,
+  paymentSummary: null
 };
 
 const app = createSlice({
@@ -22,10 +23,13 @@ const app = createSlice({
     },
     activeSelectedKeys: (state, action) => {
       state.selectedKeys = action.payload.selectedKeys;
+    },
+    activePaymentSummary: (state, action) => {
+      state.paymentSummary = action.payload.paymentSummary;
     }
   }
 });
 
 export default app.reducer;
 
-export const { activeDocumentId, activeDocumentName, updateRefresKey, activeSelectedKeys } = app.actions;
+export const { activeDocumentId, activeDocumentName, updateRefresKey, activeSelectedKeys, activePaymentSummary } = app.actions;

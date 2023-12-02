@@ -42,8 +42,9 @@ class Settings(BaseSettings):
 
     STRIPE_PUBLISHABLE_KEY: str
     STRIPE_SECRET_KEY: str
-    FREE_STRIPE_PRICE_ID: str
-    PRO_STRIPE_PRICE_ID: str
+    STRIPE_ENDPOINT_SECRET: str
+
+    CRON_JOB_SECRET_KEY: str
 
     @validator("SQLALCHEMY_DATABASE_URI", pre=True)
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:

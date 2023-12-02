@@ -8,6 +8,7 @@ import useApi from 'api/hooks/useApi';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { activeDocumentId, activeDocumentName, updateRefresKey, activeSelectedKeys } from 'store/reducers/app';
+import { resetMessages } from 'store/reducers/chat';
 
 import './menu.css';
 
@@ -45,6 +46,7 @@ const DrawerContent = () => {
     dispatch(activeDocumentId({ documentId: e.key }));
     dispatch(activeDocumentName({ documentName: documents.find((document) => document.id == e.key).title }));
     dispatch(activeSelectedKeys({ selectedKeys: e.key }));
+    dispatch(resetMessages());
   };
 
   useEffect(() => {

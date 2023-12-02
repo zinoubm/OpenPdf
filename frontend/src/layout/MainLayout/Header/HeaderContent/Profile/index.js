@@ -7,11 +7,17 @@ import { useSelector, useDispatch } from 'react-redux';
 import { activeUserEmail, activeUserFullName, activeUserId } from 'store/reducers/auth';
 
 import { useTheme } from '@mui/material/styles';
-import { Box, ButtonBase, CardContent, ClickAwayListener, Grid, IconButton, Paper, Popper, Stack, Typography } from '@mui/material';
+import { Box, ButtonBase, CardContent, ClickAwayListener, Grid, Paper, Popper, Stack, Typography } from '@mui/material';
 
 import MainCard from 'components/MainCard';
+import { Button, Progress, Badge } from 'antd';
+
 import Transitions from 'components/@extended/Transitions';
 import { LogoutOutlined } from '@ant-design/icons';
+
+const computeUsagePercentage = (usage, limit) => {
+  return (parseInt(usage) / parseInt(limit)) * 100;
+};
 
 function TabPanel({ children, value, index, ...other }) {
   return (
@@ -30,6 +36,8 @@ TabPanel.propTypes = {
 const Profile = () => {
   const theme = useTheme();
   const { userFullName, userEmail } = useSelector((state) => state.auth);
+  const { paymentSummary } = useSelector((state) => state.app);
+
   const dispatch = useDispatch();
 
   const { deleteToken } = useAuth();
@@ -59,7 +67,6 @@ const Profile = () => {
   useEffect(() => {
     const getCurrentUser = async (dispatch) => {
       const response = await currentUser();
-      console.log('Response after login:', response);
       if (response.success) {
         dispatch(activeUserEmail({ userEmail: response.data.email }));
         dispatch(activeUserFullName({ userFullName: response.data.full_name }));
@@ -103,7 +110,6 @@ const Profile = () => {
           >
             {getInitials(userFullName)}
           </div>
-          <Typography variant="subtitle1"></Typography>
         </Stack>
       </ButtonBase>
       <Popper
@@ -131,8 +137,8 @@ const Profile = () => {
                 sx={{
                   boxShadow: theme.customShadows.z1,
                   width: 290,
-                  minWidth: 240,
-                  maxWidth: 290,
+                  minWidth: 320,
+                  maxWidth: 400,
                   [theme.breakpoints.down('md')]: {
                     maxWidth: 250
                   }
@@ -167,11 +173,41 @@ const Profile = () => {
                               </Typography>
                             </Stack>
                           </Stack>
+                          {paymentSummary && (
+                            <div style={{ margin: '1em 0em' }}>
+                              <Badge
+                                style={{ backgroundColor: paymentSummary.plan_status === 'ACTIVE' ? '#0ec295' : '#ff2448' }}
+                                count={paymentSummary.plan_status}
+                              >
+                                <div style={{ padding: '0 1em' }}>
+                                  <Typography variant="h6">Plan: {paymentSummary.plan} </Typography>
+                                </div>
+                              </Badge>
+
+                              <Typography variant="h6">Usage</Typography>
+                              <Typography variant="body2" color="textSecondary">
+                                Uploads: {paymentSummary.usage.UPLOADS}/{paymentSummary.user_limits.UPLOADS}
+                              </Typography>
+                              <Progress
+                                percent={computeUsagePercentage(paymentSummary.usage.UPLOADS, paymentSummary.user_limits.UPLOADS)}
+                                showInfo={false}
+                                size={[240, 10]}
+                              />
+                              <Typography variant="body2" color="textSecondary">
+                                Questions: {paymentSummary.usage.QUERIES}/{paymentSummary.user_limits.QUERIES}
+                              </Typography>
+                              <Progress
+                                percent={computeUsagePercentage(paymentSummary.usage.QUERIES, paymentSummary.user_limits.QUERIES)}
+                                showInfo={false}
+                                size={[240, 10]}
+                              />
+                            </div>
+                          )}
                         </Grid>
                         <Grid item>
-                          <IconButton size="large" color="secondary" onClick={handleLogout}>
-                            <LogoutOutlined style={{ marginRight: '0.2em' }} /> <Typography>Logout</Typography>
-                          </IconButton>
+                          <Button icon={<LogoutOutlined />} onClick={handleLogout}>
+                            Logout
+                          </Button>
                         </Grid>
                       </Grid>
                     </CardContent>

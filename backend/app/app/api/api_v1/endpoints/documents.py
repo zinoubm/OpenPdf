@@ -20,6 +20,9 @@ from app.vectorstore.qdrant import qdrant_manager
 from app import crud, models, schemas
 from app.api import deps
 from app.core.config import settings
+from app.core.constants import FEATURES_ENUM
+from app.stripe.limiter import get_user_plan, get_user_limits
+
 
 from streaming_form_data import StreamingFormDataParser
 from streaming_form_data.targets import FileTarget, ValueTarget
@@ -98,6 +101,28 @@ async def upsert_stream(
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(deps.get_current_active_user),
 ):
+    # limiter
+    user_plan, plan_status = get_user_plan(db=db, user_id=current_user.id)
+    if plan_status != "ACTIVE":
+        raise HTTPException(
+            status_code=402,
+            detail=f"Your plan ({user_plan}) Is non active!",
+        )
+
+    user_limits = get_user_limits(user_plan)
+    usage = crud.user.get_usage(db=db, user_id=current_user.id)
+
+    if usage[FEATURES_ENUM.UPLOADS] + 1 > user_limits[FEATURES_ENUM.UPLOADS]:
+        raise HTTPException(
+            status_code=402,
+            detail=f"Max {FEATURES_ENUM.UPLOADS} limit exeeded for the {user_plan} plan!",
+        )
+
+    crud.user.increment_usage(
+        db=db, user_id=current_user.id, feature=FEATURES_ENUM.UPLOADS
+    )
+
+    # upload
     MAX_REQUEST_BODY_SIZE = settings.MAX_REQUEST_BODY_SIZE
     MAX_FILE_SIZE = settings.MAX_FILE_SIZE
 
@@ -159,6 +184,7 @@ async def upsert_stream(
             ExtraArgs={"ContentType": "application/pdf"},
         )
 
+        # Upload vectors to qdrant
         document_text = await get_document_from_file_stream(filepath)
         chunks = chunk_text(document_text, max_size=2000)
 
@@ -210,7 +236,6 @@ async def upsert_stream(
             detail="Couldn't upload embeddings to the Vectorstore",
         )
 
-    # return {"message": f"Successfuly uploaded {filename}"}
     return {"document_id": document.id, "document_title": file_.multipart_filename}
 
 
@@ -317,6 +342,28 @@ async def query_stream(
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> str:
+    # limiter will be a function
+    user_plan, plan_status = get_user_plan(db=db, user_id=current_user.id)
+    if plan_status != "ACTIVE":
+        raise HTTPException(
+            status_code=402,
+            detail=f"Your plan ({user_plan}) Is non active!",
+        )
+
+    user_limits = get_user_limits(user_plan)
+    usage = crud.user.get_usage(db=db, user_id=current_user.id)
+
+    if usage[FEATURES_ENUM.QUERIES] + 1 > user_limits[FEATURES_ENUM.QUERIES]:
+        raise HTTPException(
+            status_code=402,
+            detail=f"Max {FEATURES_ENUM.UPLOADS} limit exeeded for the {user_plan} plan!",
+        )
+
+    crud.user.increment_usage(
+        db=db, user_id=current_user.id, feature=FEATURES_ENUM.QUERIES
+    )
+
+    # Qurey
     document = crud.document.get(db=db, id=document_id)
 
     if not document:
