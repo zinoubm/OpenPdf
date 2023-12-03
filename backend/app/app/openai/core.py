@@ -30,24 +30,12 @@ def ask_stream(context, question, messages, manager):
     answer:
     """
 
-    # if messages is None:
-    #     messages_in = [
-    #         {
-    #             "role": "system",
-    #             "content": prompt,
-    #         }
-    #     ]
-
     messages.append(
         {
             "role": "system",
             "content": prompt,
         }
     )
-
-    # print("real messages_in:", messages_in)
-    print("real messages:", messages)
-    print("real question:", question)
 
     return manager.get_chat_completion_stream_with_messages(messages)
 

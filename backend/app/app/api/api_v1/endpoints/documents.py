@@ -354,8 +354,6 @@ async def query_stream(
             }
         )
 
-    print("messages_in", messages_in)
-
     # limiter will be a function
     user_plan, plan_status = get_user_plan(db=db, user_id=current_user.id)
     if plan_status != "ACTIVE":
