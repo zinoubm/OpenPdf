@@ -24,8 +24,8 @@ class Settings(BaseSettings):
             return v
         raise ValueError(v)
 
-    DOMAIN: str
-    FRONTEND_DOMAIN: str
+    # DOMAIN: str
+    # FRONTEND_DOMAIN: str
     PROJECT_NAME: str
     SERVER_HOST: str
 
