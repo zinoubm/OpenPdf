@@ -45,3 +45,12 @@ class UpsertRequest(BaseModel):
 
 class UpsertResponse(BaseModel):
     id: str
+
+class Message(BaseModel):
+    entity: Optional[str]
+    message: Optional[str]
+
+class QueryDocument(BaseModel):
+    query: str
+    messages: Optional[List[Message]]
+    document_id: int

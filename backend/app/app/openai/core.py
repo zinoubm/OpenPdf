@@ -14,7 +14,7 @@ def ask(context, question, manager):
     return manager.get_chat_completion(prompt)
 
 
-def ask_stream(context, question, manager):
+def ask_stream(context, question, messages, manager):
     prompt = f"""
     Answer the following question according to the provided context. If the context doesn't contain the answer, Do Not Answer!
     If the context Is empty, Please Say No Context!
@@ -29,7 +29,27 @@ def ask_stream(context, question, manager):
 
     answer:
     """
-    return manager.get_chat_completion_stream(prompt)
+
+    # if messages is None:
+    #     messages_in = [
+    #         {
+    #             "role": "system",
+    #             "content": prompt,
+    #         }
+    #     ]
+
+    messages.append(
+        {
+            "role": "system",
+            "content": prompt,
+        }
+    )
+
+    # print("real messages_in:", messages_in)
+    print("real messages:", messages)
+    print("real question:", question)
+
+    return manager.get_chat_completion_stream_with_messages(messages)
 
 
 def filter(context, question, manager):

@@ -337,11 +337,25 @@ async def query(
 
 @router.post("/query-stream")
 async def query_stream(
-    query: str,
-    document_id: int,
+    query_document: schemas.QueryDocument,
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> str:
+    query = query_document.query
+    messages = query_document.messages
+    document_id = query_document.document_id
+
+    messages_in = []
+    for message in messages:
+        messages_in.append(
+            {
+                "role": message.entity,
+                "content": message.message,
+            }
+        )
+
+    print("messages_in", messages_in)
+
     # limiter will be a function
     user_plan, plan_status = get_user_plan(db=db, user_id=current_user.id)
     if plan_status != "ACTIVE":
@@ -386,6 +400,7 @@ async def query_stream(
         ask_stream(
             context,
             query,
+            messages_in,
             openai_manager,
         ),
         media_type="text/event-stream",

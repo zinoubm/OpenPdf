@@ -158,23 +158,24 @@ const useApi = () => {
     }
   };
 
-  const queryDocument = async (query, document_id) => {
-    dispatch(updateMessages({ messages: { entity: 'user', message: query }, accumulate: false }));
-
+  const queryDocument = async (query, messages, document_id) => {
     const headers = {
+      'Content-Type': 'application/json',
       Accept: 'application/json',
       Authorization: 'Bearer ' + getToken()
     };
 
-    const params = new URLSearchParams({
+    const data = {
       query: query,
+      messages: messages,
       document_id: document_id
-    });
+    };
 
     try {
-      const response = await fetch(process.env.REACT_APP_BACKEND_URL + '/api/v1/documents/query-stream?' + params.toString(), {
-        method: 'POST',
-        headers: headers
+      const response = await fetch(process.env.REACT_APP_BACKEND_URL + '/api/v1/documents/query-stream', {
+        body: JSON.stringify(data),
+        headers: headers,
+        method: 'POST'
       });
 
       if (!response.ok) {
@@ -200,7 +201,7 @@ const useApi = () => {
           break;
         }
         accumulatedResponse += decoder.decode(value);
-        dispatch(updateMessages({ messages: { entity: 'bot', message: accumulatedResponse }, accumulate: true }));
+        dispatch(updateMessages({ messages: { entity: 'system', message: accumulatedResponse }, accumulate: true }));
       }
 
       dispatch(updateIsLoading({ isLoading: false }));

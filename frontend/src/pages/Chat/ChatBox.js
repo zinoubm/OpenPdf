@@ -6,7 +6,7 @@ import { UserOutlined } from '@ant-design/icons';
 
 import useApi from 'api/hooks/useApi';
 import { useSelector, useDispatch } from 'react-redux';
-import { updateIsLoading } from 'store/reducers/chat';
+import { updateMessages, updateIsLoading } from 'store/reducers/chat';
 
 import Markdown from 'react-markdown';
 
@@ -30,9 +30,9 @@ const ChatBox = () => {
   const messageInput = useRef();
 
   const defaultMessage = [
-    { entity: 'bot', message: 'Hello, feel free to check out these examples.' },
+    { entity: 'system', message: 'Hello, feel free to check out these examples.' },
     {
-      entity: 'bot',
+      entity: 'system',
       message: (
         <Space direction="vertical">
           {questionSuggestions.map((suggestion, index) => {
@@ -65,7 +65,8 @@ const ChatBox = () => {
     const currentMessage = messageInput.current.input.value;
     dispatch(updateIsLoading({ isLoading: true }));
     setInputValue('');
-    await queryDocument(currentMessage, documentId);
+    dispatch(updateMessages({ messages: { entity: 'user', message: currentMessage }, accumulate: false }));
+    await queryDocument(currentMessage, messages, documentId);
   };
 
   const handleInputChange = (e) => {
