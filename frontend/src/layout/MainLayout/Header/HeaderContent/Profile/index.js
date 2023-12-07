@@ -175,14 +175,13 @@ const Profile = () => {
                           </Stack>
                           {paymentSummary && (
                             <div style={{ margin: '1em 0em' }}>
-                              <Badge
-                                style={{ backgroundColor: paymentSummary.plan_status === 'ACTIVE' ? '#0ec295' : '#ff2448' }}
-                                count={paymentSummary.plan_status}
-                              >
-                                <div style={{ padding: '0 1em' }}>
-                                  <Typography variant="h6">Plan: {paymentSummary.plan} </Typography>
-                                </div>
-                              </Badge>
+                              <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                                <Typography variant="h6">Plan: {paymentSummary.plan} </Typography>
+                                <Badge
+                                  style={{ backgroundColor: paymentSummary.plan_status === 'ACTIVE' ? '#0ec295' : '#ff2448' }}
+                                  count={paymentSummary.plan_status}
+                                ></Badge>
+                              </div>
 
                               <Typography variant="h6">Usage</Typography>
                               <Typography variant="body2" color="textSecondary">

@@ -161,10 +161,15 @@ async def upsert_stream(
 
         bucket_name = os.getenv("AWS_BUCKET_NAME")
 
+        # generate a uuid for the object
+        # add it to the document
+
         document_in = schemas.DocumentCreate(title=file_.multipart_filename)
         document = crud.document.create_with_user(
             db=db, obj_in=document_in, user_id=current_user.id
         )
+
+        # use to upload to s3
 
         object_key = (
             "documents"

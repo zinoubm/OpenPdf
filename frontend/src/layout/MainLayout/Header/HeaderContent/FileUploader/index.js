@@ -30,6 +30,7 @@ function FileUploader() {
         notification.config({
           duration: 10
         });
+
         notification.info({
           message: `Plan Limits Reached.`,
           description: 'You reached your subscription limits, Please Upgrade to get more quotas.',
