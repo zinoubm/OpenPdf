@@ -38,9 +38,7 @@ function LandingPage() {
             <br />
             Read 64% Faster!
           </Typography>
-          <Typography className="hero-typography-description">
-            Highlight the apps key feature - the ability to upload PDFs and ask questions directly from them.
-          </Typography>
+          <Typography className="hero-typography-description">No Time? Get your answers in 1 click! </Typography>
           <Button href="/login" className="hero-cta-button" size="large">
             Get Started For Free
           </Button>
