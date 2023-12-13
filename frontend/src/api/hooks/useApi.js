@@ -239,6 +239,27 @@ const useApi = () => {
     }
   };
 
+  const getQuestionSuggestions = async (document_id) => {
+    try {
+      const response = await axios.get('/documents/question-suggestions', {
+        params: {
+          document_id: document_id
+        },
+        headers: {
+          accept: 'application/json',
+          Authorization: 'Bearer ' + getToken()
+        }
+      });
+
+      // console.log(response);
+
+      return response.data.suggestions;
+    } catch (err) {
+      if (err.response.status === 403) navigate('/login');
+      return errorHandler(err);
+    }
+  };
+
   return {
     currentUser,
     getPaymentSummary,
@@ -248,6 +269,7 @@ const useApi = () => {
     getDocuments,
     getDocumentUrl,
     queryDocument,
+    getQuestionSuggestions,
     deleteDocument
   };
 };

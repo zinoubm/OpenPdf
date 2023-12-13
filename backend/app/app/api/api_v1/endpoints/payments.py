@@ -46,6 +46,9 @@ async def webhook(request: Request, db: Session = Depends(deps.get_db)):
                     obj_in=stripe_customer_in,
                     user_id=user_id,
                 )
+            # reset usage for upgraded accounts
+            # user = crud.user.reset_usage(db=db, user_id=user_id)
+
 
         if event["type"] == "customer.subscription.updated":
             subscription = event["data"]["object"]

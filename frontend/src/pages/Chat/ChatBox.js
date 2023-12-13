@@ -1,59 +1,44 @@
 import React from 'react';
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
-import { List, Input, Space, Button, Alert, Typography, Card } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
+import { List, Input, Space, Button, Alert, Typography, Card, Popover } from 'antd';
 
 import useApi from 'api/hooks/useApi';
 import { useSelector, useDispatch } from 'react-redux';
-import { updateMessages, updateIsLoading } from 'store/reducers/chat';
+import { updateMessages, updateIsLoading, updateInputValue } from 'store/reducers/chat';
+
+import { QuestionSuggestions } from './QuestionSuggestions';
 
 import Markdown from 'react-markdown';
+
+import { BulbOutlined } from '@ant-design/icons';
 
 import miniLogo from 'assets/images/miniLogo.svg';
 import './scrollBar.css';
 
 const { Title } = Typography;
 
-const questionSuggestions = ['Give a summary of this document', 'What are the main points discussed in this document?'];
-
 const ChatBox = () => {
   const { queryDocument } = useApi();
   const dispatch = useDispatch();
 
-  const { messages, isLoading } = useSelector((state) => state.chat);
+  const { messages, inputValue, isLoading } = useSelector((state) => state.chat);
+  const { userFullName } = useSelector((state) => state.auth);
   const { documentName, documentId } = useSelector((state) => state.app);
 
-  const [inputValue, setInputValue] = useState('');
   const [isAlert, setisAlert] = useState(false);
+  const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
 
   const messageInput = useRef();
 
   const defaultMessage = [
-    { entity: 'system', message: 'Hello, feel free to check out these examples.' },
-    {
-      entity: 'system',
-      message: (
-        <Space direction="vertical">
-          {questionSuggestions.map((suggestion, index) => {
-            return (
-              <Button
-                key={index}
-                value={suggestion}
-                style={{ width: '100%', border: '1px black solid' }}
-                size="large"
-                onClick={() => {
-                  setInputValue(suggestion);
-                }}
-              >
-                {suggestion}
-              </Button>
-            );
-          })}
-        </Space>
-      )
-    }
+    { entity: 'system', message: 'Hello, How can we help you today?' },
+    { entity: 'system', message: 'Click the bulb Icon to get suggestions.' }
   ];
+
+  const handleSuggest = async () => {
+    setIsSuggestionsOpen(!isSuggestionsOpen);
+  };
 
   const handleSubmit = async () => {
     if (documentId === null) {
@@ -64,14 +49,19 @@ const ChatBox = () => {
     }
     const currentMessage = messageInput.current.input.value;
     dispatch(updateIsLoading({ isLoading: true }));
-    setInputValue('');
+    dispatch(updateInputValue({ inputValue: '' }));
+
     dispatch(updateMessages({ messages: { entity: 'user', message: currentMessage }, accumulate: false }));
     await queryDocument(currentMessage, messages, documentId);
   };
 
   const handleInputChange = (e) => {
-    setInputValue(e.target.value);
+    dispatch(updateInputValue({ inputValue: e.target.value }));
   };
+
+  useEffect(() => {
+    if (isSuggestionsOpen === false && documentId != null) setIsSuggestionsOpen(true);
+  }, [documentId]);
 
   return (
     <Card
@@ -91,23 +81,41 @@ const ChatBox = () => {
         renderItem={(item) => (
           <List.Item style={{ padding: '1em' }}>
             {item.entity === 'user' ? (
-              <UserOutlined
-                style={{
-                  marginRight: '1em',
-                  fontSize: '1.4em'
-                }}
-              />
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div
+                  style={{
+                    backgroundColor: '#0a0a0a',
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    fontSize: '20px',
+                    marginRight: '1em'
+                  }}
+                >
+                  {userFullName[0].toUpperCase()}
+                </div>
+                <Title level={5}>You</Title>
+              </div>
             ) : (
-              <img
-                src={miniLogo}
-                alt="entity"
-                style={{
-                  width: '1.6em',
-                  height: 'auto',
-                  marginRight: '1em'
-                }}
-              />
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <img
+                  src={miniLogo}
+                  alt="entity"
+                  style={{
+                    width: '1.6em',
+                    height: 'auto',
+                    marginRight: '1em'
+                  }}
+                />
+                <Title level={5}>OpenPdfAI</Title>
+              </div>
             )}
+            <br />
             {messages.length > 0 ? <Markdown>{item.message.trim()}</Markdown> : item.message}
           </List.Item>
         )}
@@ -121,6 +129,13 @@ const ChatBox = () => {
           placeholder="Ask a question"
           ref={messageInput}
         />
+
+        <Popover content={<QuestionSuggestions />} open={isSuggestionsOpen} placement="topRight" title="Suggestions">
+          <Button style={{ background: 'transparent', height: '100%', color: '#0ec295' }} onClick={handleSuggest}>
+            <BulbOutlined />
+          </Button>
+        </Popover>
+
         <Button loading={isLoading} style={{ background: '#0a0a0a', height: '100%' }} type="primary" onClick={handleSubmit}>
           Send
         </Button>

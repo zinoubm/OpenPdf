@@ -4,6 +4,7 @@ import { createSlice } from '@reduxjs/toolkit';
 // initial state
 const initialState = {
   messages: [],
+  inputValue: '',
   isLoading: false,
   isAlert: false
 };
@@ -24,6 +25,9 @@ const chat = createSlice({
         state.messages = [...state.messages, action.payload.messages];
       }
     },
+    updateInputValue: (state, action) => {
+      state.inputValue = action.payload.inputValue;
+    },
     resetMessages: (state) => {
       state.messages = [];
     },
@@ -38,4 +42,4 @@ const chat = createSlice({
 
 export default chat.reducer;
 
-export const { updateMessages, updateIsLoading, updateIsAlert, resetMessages } = chat.actions;
+export const { updateMessages, updateInputValue, updateIsLoading, updateIsAlert, resetMessages } = chat.actions;

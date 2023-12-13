@@ -4,6 +4,8 @@ import useApi from 'api/hooks/useApi';
 import { useSelector, useDispatch } from 'react-redux';
 import { activePaymentSummary } from 'store/reducers/app';
 
+import { Popover } from 'antd';
+
 import StripePricingTable from './StripePricingTable';
 import './StripePricingTable.css';
 
@@ -69,21 +71,23 @@ function Upgrade() {
           Upgrade
         </Button>
       ) : (
-        <Button
-          variant="contained"
-          style={{
-            color: 'white',
-            borderRadius: '10px',
-            border: 'solid 2px',
-            background: '#0ec295',
-            marginRight: '.6em',
-            paddingLeft: '2em',
-            paddingRight: '2em'
-          }}
-          onClick={handleGetRedirectUrl}
-        >
-          Manage
-        </Button>
+        <Popover content={<div>Update your subscription plan.</div>} title="Manage">
+          <Button
+            variant="contained"
+            style={{
+              color: 'white',
+              borderRadius: '10px',
+              border: 'solid 2px',
+              background: '#0ec295',
+              marginRight: '.6em',
+              paddingLeft: '2em',
+              paddingRight: '2em'
+            }}
+            onClick={handleGetRedirectUrl}
+          >
+            Manage
+          </Button>
+        </Popover>
       )}
 
       <Modal open={isModalOpen} onClose={handleClose}>
