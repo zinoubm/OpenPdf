@@ -31,10 +31,7 @@ const ChatBox = () => {
 
   const messageInput = useRef();
 
-  const defaultMessage = [
-    { entity: 'system', message: 'Hello, How can we help you today?' },
-    { entity: 'system', message: 'Click the bulb Icon to get suggestions.' }
-  ];
+  const defaultMessage = [{ entity: 'system', message: 'Hello, How can we help you today?' }];
 
   const handleSuggest = async () => {
     setIsSuggestionsOpen(!isSuggestionsOpen);

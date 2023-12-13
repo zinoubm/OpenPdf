@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { Menu, Button } from 'antd';
+import { Menu, Button, Badge } from 'antd';
 import { FilePdfOutlined, UnorderedListOutlined, DeleteOutlined } from '@ant-design/icons';
 
 import SimpleBar from 'components/third-party/SimpleBar';
@@ -81,7 +81,15 @@ const DrawerContent = () => {
           ))}
         </Menu.SubMenu>
 
-        <Menu.SubMenu key={'collections'} title={'Collections'} icon={<UnorderedListOutlined />}></Menu.SubMenu>
+        <Menu.SubMenu
+          key={'collections'}
+          title={
+            <Badge offset={[30, 20]} style={{ backgroundColor: 'transparent', color: 'white' }} count="soon">
+              <p style={{ color: 'white' }}>Collections</p>
+            </Badge>
+          }
+          icon={<UnorderedListOutlined />}
+        ></Menu.SubMenu>
       </Menu>
     </SimpleBar>
   );
