@@ -213,13 +213,14 @@ async def upsert_stream(
                     }
                     for batch_chunk in current_batch
                 ]
-                embeddings = openai_manager.get_embeddings(current_batch)
-
-                res = qdrant_manager.upsert_points(ids, payloads, embeddings)
+                try:
+                    embeddings = openai_manager.get_embeddings(current_batch)
+                    res = qdrant_manager.upsert_points(ids, payloads, embeddings)
+                except:
+                    print("Couldn't get embeddings")
 
                 current_batch = []
 
-        # If there are remaining chunks that didn't complete a full batch
         if current_batch:
             ids = [uuid4().hex for batch_chunk in current_batch]
             payloads = [
@@ -230,9 +231,12 @@ async def upsert_stream(
                 }
                 for batch_chunk in current_batch
             ]
-            embeddings = openai_manager.get_embeddings(current_batch)
 
-            res = qdrant_manager.upsert_points(ids, payloads, embeddings)
+            try:
+                embeddings = openai_manager.get_embeddings(current_batch)
+                res = qdrant_manager.upsert_points(ids, payloads, embeddings)
+            except:
+                print("Couldn't get embeddings")
 
     except Exception as e:
         crud.document.remove(db=db, id=document.id)
