@@ -180,8 +180,8 @@ async def upsert_stream(
             + "doc"
             + "-"
             + str(document.id)
-            + "-"
-            + file_.multipart_filename
+            + "."
+            + mimetype
         )
 
         # Upload the file to S3
@@ -294,8 +294,16 @@ def document_url(
         )
         s3 = session.client("s3")
 
+        mimetype, _ = mimetypes.guess_type(document.title)
+
         object_key = (
-            "documents" + "/" + "doc" + "-" + str(document.id) + "-" + document.title
+            "documents"
+            + "/"
+            + "doc"
+            + "-"
+            + str(document.id)
+            + "."
+            + mimetype
         )
 
         url = s3.generate_presigned_url(
@@ -481,9 +489,18 @@ def delete_document(
         bucket_name = os.getenv("AWS_BUCKET_NAME")
         s3 = session.client("s3")
 
+        mimetype, _ = mimetypes.guess_type(document.title)
+
         object_key = (
-            "documents" + "/" + "doc" + "-" + str(document.id) + "-" + document.title
+            "documents"
+            + "/"
+            + "doc"
+            + "-"
+            + str(document.id)
+            + "."
+            + mimetype
         )
+
         s3.delete_object(Bucket=bucket_name, Key=object_key)
 
     except Exception as e:
