@@ -4,7 +4,11 @@ from app.core.constants import PLANS_ENUM, FEATURES_LIMITS_MATRIX
 
 
 def get_user_plan(db, user_id):
+    user = crud.user.get(db=db, id=user_id)
     stripe_customer = crud.stripecustomer.get_with_user(db=db, user_id=user_id)
+
+    if user.is_superuser:
+        return PLANS_ENUM.ADMIN, "ACTIVE"
 
     if stripe_customer:
         subscription = stripe.Subscription.retrieve(
@@ -29,16 +33,3 @@ def get_user_limits(plan):
         return FEATURES_LIMITS_MATRIX[plan]
 
     return FEATURES_LIMITS_MATRIX[PLANS_ENUM.FREE]
-
-
-# maybe we don't need this
-def get_user_subscription_status(user_id):
-    pass
-
-
-def get_user_usage(user_id):
-    pass
-
-
-def increment_user_usage(user_id, feature):
-    pass

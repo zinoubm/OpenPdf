@@ -180,8 +180,7 @@ async def upsert_stream(
             + "doc"
             + "-"
             + str(document.id)
-            + "."
-            + mimetype
+            + ".pdf"
         )
 
         # Upload the file to S3
@@ -302,8 +301,7 @@ def document_url(
             + "doc"
             + "-"
             + str(document.id)
-            + "."
-            + mimetype
+            + ".pdf"
         )
 
         url = s3.generate_presigned_url(
@@ -497,8 +495,7 @@ def delete_document(
             + "doc"
             + "-"
             + str(document.id)
-            + "."
-            + mimetype
+            + ".pdf"
         )
 
         s3.delete_object(Bucket=bucket_name, Key=object_key)
