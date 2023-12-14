@@ -12,8 +12,15 @@ sudo docker-compose exec backend bash /app/tests-start.sh -x
 
 # react test user
 "password": "12341234",
-"email": "lolo@example.com",
-"full_name": "string"
+"email": "test@example.com",
+
+# non verified test user
+"password": "12341234",
+"email": "nonverified@example.com",
+
+# free stripe test account
+"password": "12341234",
+"email": "freestripe2@test.com",
 
 # this is a dummy comment
 # open source reference https://demo-erp-crm.idurarapp.com/

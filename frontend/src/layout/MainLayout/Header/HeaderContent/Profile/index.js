@@ -1,36 +1,24 @@
 import PropTypes from 'prop-types';
 import { useRef, useState, useEffect } from 'react';
 import useAuth from 'api/hooks/useAuth';
-// import useCurrentUser from 'api/hooks/useCurrentUser';
 import useApi from 'api/hooks/useApi';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { activeUserEmail, activeUserFullName } from 'store/reducers/auth';
+import { activeUserEmail, activeUserFullName, activeUserId } from 'store/reducers/auth';
 
-// material-ui
 import { useTheme } from '@mui/material/styles';
-import {
-  // Avatar,
-  Box,
-  ButtonBase,
-  CardContent,
-  ClickAwayListener,
-  Grid,
-  IconButton,
-  Paper,
-  Popper,
-  Stack,
-  // Tab,
-  // Tabs,
-  Typography
-} from '@mui/material';
+import { Box, ButtonBase, CardContent, ClickAwayListener, Grid, Paper, Popper, Stack, Typography } from '@mui/material';
 
-// project import
 import MainCard from 'components/MainCard';
+import { Button, Progress, Badge } from 'antd';
+
 import Transitions from 'components/@extended/Transitions';
 import { LogoutOutlined } from '@ant-design/icons';
 
-// tab panel wrapper
+const computeUsagePercentage = (usage, limit) => {
+  return (parseInt(usage) / parseInt(limit)) * 100;
+};
+
 function TabPanel({ children, value, index, ...other }) {
   return (
     <div role="tabpanel" hidden={value !== index} id={`profile-tabpanel-${index}`} aria-labelledby={`profile-tab-${index}`} {...other}>
@@ -45,22 +33,14 @@ TabPanel.propTypes = {
   value: PropTypes.any.isRequired
 };
 
-// function a11yProps(index) {
-//   return {
-//     id: `profile-tab-${index}`,
-//     'aria-controls': `profile-tabpanel-${index}`
-//   };
-// }
-
-// ==============================|| HEADER CONTENT - PROFILE ||============================== //
-
 const Profile = () => {
   const theme = useTheme();
   const { userFullName, userEmail } = useSelector((state) => state.auth);
+  const { paymentSummary } = useSelector((state) => state.app);
+
   const dispatch = useDispatch();
 
   const { deleteToken } = useAuth();
-  // const currentUser = useCurrentUser();
   const { currentUser } = useApi();
 
   const handleLogout = async () => {
@@ -90,6 +70,7 @@ const Profile = () => {
       if (response.success) {
         dispatch(activeUserEmail({ userEmail: response.data.email }));
         dispatch(activeUserFullName({ userFullName: response.data.full_name }));
+        dispatch(activeUserId({ userId: response.data.id }));
       }
     };
     getCurrentUser(dispatch);
@@ -129,7 +110,6 @@ const Profile = () => {
           >
             {getInitials(userFullName)}
           </div>
-          <Typography variant="subtitle1"></Typography>
         </Stack>
       </ButtonBase>
       <Popper
@@ -157,8 +137,8 @@ const Profile = () => {
                 sx={{
                   boxShadow: theme.customShadows.z1,
                   width: 290,
-                  minWidth: 240,
-                  maxWidth: 290,
+                  minWidth: 320,
+                  maxWidth: 400,
                   [theme.breakpoints.down('md')]: {
                     maxWidth: 250
                   }
@@ -193,50 +173,46 @@ const Profile = () => {
                               </Typography>
                             </Stack>
                           </Stack>
+                          {paymentSummary && (
+                            <div style={{ margin: '1em 0em' }}>
+                              <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                                <Typography variant="h6">Plan: {paymentSummary.plan} </Typography>
+                                <Badge
+                                  style={{ backgroundColor: paymentSummary.plan_status === 'ACTIVE' ? '#0ec295' : '#ff2448' }}
+                                  count={paymentSummary.plan_status}
+                                ></Badge>
+                              </div>
+
+                              <Typography variant="h6">Usage</Typography>
+                              <Typography variant="body2" color="textSecondary">
+                                Uploads: {paymentSummary.usage.UPLOADS}/{paymentSummary.user_limits.UPLOADS}
+                              </Typography>
+                              <Progress
+                                percent={computeUsagePercentage(paymentSummary.usage.UPLOADS, paymentSummary.user_limits.UPLOADS)}
+                                showInfo={false}
+                                size={[240, 10]}
+                              />
+                              <Typography variant="body2" color="textSecondary">
+                                Questions: {paymentSummary.usage.QUERIES}/{paymentSummary.user_limits.QUERIES}
+                              </Typography>
+                              <Progress
+                                percent={computeUsagePercentage(paymentSummary.usage.QUERIES, paymentSummary.user_limits.QUERIES)}
+                                showInfo={false}
+                                size={[240, 10]}
+                              />
+                            </div>
+                          )}
                         </Grid>
                         <Grid item>
-                          <IconButton size="large" color="secondary" onClick={handleLogout}>
-                            <LogoutOutlined />
-                          </IconButton>
+                          <Button icon={<LogoutOutlined />} onClick={handleLogout}>
+                            Logout
+                          </Button>
                         </Grid>
                       </Grid>
                     </CardContent>
                     {open && (
                       <>
-                        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                          {/* <Tabs variant="fullWidth" value={value} onChange={handleChange} aria-label="profile tabs">
-                            <Tab
-                              sx={{
-                                display: 'flex',
-                                flexDirection: 'row',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                textTransform: 'capitalize'
-                              }}
-                              icon={<UserOutlined style={{ marginBottom: 0, marginRight: '10px' }} />}
-                              label="Profile"
-                              {...a11yProps(0)}
-                            />
-                            <Tab
-                              sx={{
-                                display: 'flex',
-                                flexDirection: 'row',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                textTransform: 'capitalize'
-                              }}
-                              icon={<SettingOutlined style={{ marginBottom: 0, marginRight: '10px' }} />}
-                              label="Setting"
-                              {...a11yProps(1)}
-                            />
-                          </Tabs> */}
-                        </Box>
-                        {/* <TabPanel value={value} index={0} dir={theme.direction}>
-                          <ProfileTab handleLogout={handleLogout} />
-                        </TabPanel>
-                        <TabPanel value={value} index={1} dir={theme.direction}>
-                          <SettingTab />
-                        </TabPanel> */}
+                        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}></Box>
                       </>
                     )}
                   </MainCard>

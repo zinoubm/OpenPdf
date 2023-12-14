@@ -29,6 +29,10 @@ const useLogin = () => {
       navigate('/');
       return true;
     } catch (err) {
+      if (err.response && err.response.status === 401) {
+        navigate('/verify');
+        console.log('User non verified');
+      }
       return false;
     }
   };

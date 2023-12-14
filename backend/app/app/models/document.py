@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 class Document(Base):
     id: int = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
+    # use the preview to store object key
     preview = Column(String, nullable=True)
     uploaded_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()

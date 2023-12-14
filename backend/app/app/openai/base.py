@@ -50,6 +50,25 @@ class OpenAiManager:
             logging.error(f"Sorry, There was a problem \n\n {err}")
 
         return response
+    
+    def follow_instruction(self, prompt, max_tokens=200, model="gpt-3.5-turbo-instruct"):
+        response = None
+        try:
+            response = (
+                openai.Completion.create(
+                    model=model,
+                    prompt=prompt,
+                    temperature=0,
+                    max_tokens=max_tokens
+                )
+                .choices[0]
+                .text.strip()
+            )
+
+        except Exception as err:
+            logging.error(f"Sorry, There was a problem \n\n {err}")
+
+        return response
 
     def get_chat_completion_stream(self, prompt, model="gpt-3.5-turbo"):
         try:
@@ -61,6 +80,20 @@ class OpenAiManager:
                         "content": prompt,
                     }
                 ],
+                stream=True,
+            ):
+                content = chunk["choices"][0].get("delta", {}).get("content")
+                if content is not None:
+                    yield content
+
+        except Exception as err:
+            logging.error(f"Sorry, There was a problem \n\n {err}")
+
+    def get_chat_completion_stream_with_messages(self, messages, model="gpt-3.5-turbo"):
+        try:
+            for chunk in openai.ChatCompletion.create(
+                model=model,
+                messages=messages,
                 stream=True,
             ):
                 content = chunk["choices"][0].get("delta", {}).get("content")

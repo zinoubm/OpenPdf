@@ -1,10 +1,9 @@
-// types
 import { createSlice } from '@reduxjs/toolkit';
 
-// initial state
 const initialState = {
-  userFullName: 'Test User',
-  userEmail: 'user@test.com'
+  userFullName: ' ',
+  userEmail: ' ',
+  userId: 0
 };
 
 const auth = createSlice({
@@ -16,10 +15,13 @@ const auth = createSlice({
     },
     activeUserFullName: (state, action) => {
       state.userFullName = action.payload.userFullName;
+    },
+    activeUserId: (state, action) => {
+      state.userId = action.payload.userId;
     }
   }
 });
 
 export default auth.reducer;
 
-export const { activeUserEmail, activeUserFullName } = auth.actions;
+export const { activeUserEmail, activeUserFullName, activeUserId } = auth.actions;

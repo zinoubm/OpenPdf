@@ -13,8 +13,9 @@ def chunk_text(text, max_size=4000):
         if len(chunck) + len(sentence) < max_size:
             chunck += sentence
         else:
-            chuncks.append(chunck.strip())
-            chunck = ""
+            if chunck.strip() and chunck.strip() is not None:
+                chuncks.append(chunck.strip())
+                chunck = ""
 
     if not chuncks:
         chuncks.append(chunck.strip())

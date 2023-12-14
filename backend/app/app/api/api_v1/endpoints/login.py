@@ -15,6 +15,8 @@ from app.utils import (
     send_reset_password_email,
     verify_password_reset_token,
     generate_password,
+    generate_email_verification_token,
+    send_verification_email,
 )
 
 from google.oauth2 import id_token
@@ -35,8 +37,19 @@ def login_access_token(
     )
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
-    elif not crud.user.is_active(user):
+    if not crud.user.is_active(user):
         raise HTTPException(status_code=400, detail="Inactive user")
+    
+    if not crud.user.is_verified(user):
+        email_verification_token = generate_email_verification_token(
+                email=user.email
+            )
+        send_verification_email(
+            email_to=user.email,
+            email=user.email,
+            token=email_verification_token,
+        )
+        raise HTTPException(status_code=401, detail="Unverified user")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     return {
         "access_token": security.create_access_token(
@@ -82,6 +95,8 @@ def google_authentication(
             password=generate_password(), email=user_email, full_name=user_full_name
         )
         user = crud.user.create(db, obj_in=user_in)
+
+    user = crud.user.verify(db, user)
 
     if not crud.user.is_active(user):
         raise HTTPException(status_code=400, detail="Inactive user")

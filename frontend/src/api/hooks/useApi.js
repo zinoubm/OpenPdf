@@ -3,9 +3,8 @@ import axios from '../axios';
 import useAuth from './useAuth';
 import { useNavigate } from 'react-router-dom';
 import successHandler from 'request/successHandler';
-
+import { notification } from 'antd';
 import { useDispatch } from 'react-redux';
-
 import { updateMessages, updateIsLoading } from 'store/reducers/chat';
 
 const useApi = () => {
@@ -21,10 +20,39 @@ const useApi = () => {
           Authorization: 'Bearer ' + getToken()
         }
       });
-
       return successHandler(response);
     } catch (err) {
       if (err.response.status === 403) navigate('/login');
+      return errorHandler(err);
+    }
+  };
+
+  const getPaymentSummary = async () => {
+    try {
+      const response = await axios.get('/stripe/summary', {
+        headers: {
+          accept: 'application/json',
+          Authorization: 'Bearer ' + getToken()
+        }
+      });
+
+      return successHandler(response);
+    } catch (err) {
+      return errorHandler(err);
+    }
+  };
+
+  const getCustomerPortalUrl = async () => {
+    try {
+      const response = await axios.get('/stripe/customer-portal', {
+        headers: {
+          accept: 'application/json',
+          Authorization: 'Bearer ' + getToken()
+        }
+      });
+
+      return response.data.url;
+    } catch (err) {
       return errorHandler(err);
     }
   };
@@ -45,6 +73,16 @@ const useApi = () => {
       return successHandler(response, { notifyOnSuccess: true });
     } catch (err) {
       if (err.response.status === 403) navigate('/login');
+      if (err.status === 402) {
+        notification.config({
+          duration: 10
+        });
+        notification.info({
+          message: `Plan Limits Reached.`,
+          description: 'You reached your subscription limits, Please Upgrade to get more quotas.',
+          placement: 'bottomRight'
+        });
+      }
       return errorHandler(err);
     }
   };
@@ -62,12 +100,22 @@ const useApi = () => {
           'Content-Type': 'multipart/form-data',
           Filename: file.name
         },
-        timeout: 200 * 1000 // 200 seconds
+        timeout: 2000 * 1000 // 200 seconds
       });
 
       return successHandler(response, { notifyOnSuccess: true });
     } catch (err) {
       if (err.response.status === 403) navigate('/login');
+      if (err.status === 402) {
+        notification.config({
+          duration: 10
+        });
+        notification.info({
+          message: `Plan Limits Reached.`,
+          description: 'You reached your subscription limits, Please Upgrade to get more quotas.',
+          placement: 'bottomRight'
+        });
+      }
       return errorHandler(err);
     }
   };
@@ -110,23 +158,24 @@ const useApi = () => {
     }
   };
 
-  const queryDocument = async (query, document_id) => {
-    dispatch(updateMessages({ messages: { entity: 'user', message: query }, accumulate: false }));
-
+  const queryDocument = async (query, messages, document_id) => {
     const headers = {
+      'Content-Type': 'application/json',
       Accept: 'application/json',
       Authorization: 'Bearer ' + getToken()
     };
 
-    const params = new URLSearchParams({
+    const data = {
       query: query,
+      messages: messages,
       document_id: document_id
-    });
+    };
 
     try {
-      const response = await fetch(process.env.REACT_APP_BACKEND_URL + '/api/v1/documents/query-stream?' + params.toString(), {
-        method: 'POST',
-        headers: headers
+      const response = await fetch(process.env.REACT_APP_BACKEND_URL + '/api/v1/documents/query-stream', {
+        body: JSON.stringify(data),
+        headers: headers,
+        method: 'POST'
       });
 
       if (!response.ok) {
@@ -152,14 +201,23 @@ const useApi = () => {
           break;
         }
         accumulatedResponse += decoder.decode(value);
-        dispatch(updateMessages({ messages: { entity: 'bot', message: accumulatedResponse }, accumulate: true }));
+        dispatch(updateMessages({ messages: { entity: 'system', message: accumulatedResponse }, accumulate: true }));
       }
 
       dispatch(updateIsLoading({ isLoading: false }));
     } catch (err) {
       console.error('Error:', err);
       if (err.status === 403) navigate('/login');
-      // return errorHandler(err, err.status);
+      if (err.status === 402) {
+        notification.config({
+          duration: 10
+        });
+        notification.info({
+          message: `Plan Limits Reached.`,
+          description: 'You reached your subscription limits, Please Upgrade to get more quotas.',
+          placement: 'bottomRight'
+        });
+      }
     } finally {
       dispatch(updateIsLoading({ isLoading: false }));
     }
@@ -181,7 +239,39 @@ const useApi = () => {
     }
   };
 
-  return { currentUser, uploadDocument, uploadDocumentStream, getDocuments, getDocumentUrl, queryDocument, deleteDocument };
+  const getQuestionSuggestions = async (document_id) => {
+    try {
+      const response = await axios.get('/documents/question-suggestions', {
+        params: {
+          document_id: document_id
+        },
+        headers: {
+          accept: 'application/json',
+          Authorization: 'Bearer ' + getToken()
+        }
+      });
+
+      // console.log(response);
+
+      return response.data.suggestions;
+    } catch (err) {
+      if (err.response.status === 403) navigate('/login');
+      return errorHandler(err);
+    }
+  };
+
+  return {
+    currentUser,
+    getPaymentSummary,
+    getCustomerPortalUrl,
+    uploadDocument,
+    uploadDocumentStream,
+    getDocuments,
+    getDocumentUrl,
+    queryDocument,
+    getQuestionSuggestions,
+    deleteDocument
+  };
 };
 
 export default useApi;

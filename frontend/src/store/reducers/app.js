@@ -1,11 +1,11 @@
-// types
 import { createSlice } from '@reduxjs/toolkit';
 
-// initial state
 const initialState = {
   documentId: null,
   documentName: 'Please select a document.',
-  refreshKey: 0
+  refreshKey: 0,
+  selectedKeys: null,
+  paymentSummary: null
 };
 
 const app = createSlice({
@@ -20,10 +20,16 @@ const app = createSlice({
     },
     updateRefresKey: (state) => {
       state.refreshKey += 1;
+    },
+    activeSelectedKeys: (state, action) => {
+      state.selectedKeys = action.payload.selectedKeys;
+    },
+    activePaymentSummary: (state, action) => {
+      state.paymentSummary = action.payload.paymentSummary;
     }
   }
 });
 
 export default app.reducer;
 
-export const { activeDocumentId, activeDocumentName, updateRefresKey } = app.actions;
+export const { activeDocumentId, activeDocumentName, updateRefresKey, activeSelectedKeys, activePaymentSummary } = app.actions;

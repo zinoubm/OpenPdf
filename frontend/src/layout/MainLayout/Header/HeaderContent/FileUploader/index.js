@@ -7,7 +7,7 @@ import useApi from 'api/hooks/useApi';
 import { useState } from 'react';
 
 import { useDispatch } from 'react-redux';
-import { updateRefresKey } from 'store/reducers/app';
+import { activeDocumentId, activeDocumentName, updateRefresKey, activeSelectedKeys } from 'store/reducers/app';
 
 function FileUploader() {
   const { uploadDocumentStream } = useApi();
@@ -15,12 +15,31 @@ function FileUploader() {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleUpload = ({ target }) => {
+  const handleUpload = async ({ target }) => {
     setIsLoading(true);
-    uploadDocumentStream(target.files[0]).then(() => {
-      setIsLoading(false);
+    try {
+      const response = await uploadDocumentStream(target.files[0]);
+
+      dispatch(activeDocumentId({ documentId: response.data.document_id }));
+      dispatch(activeDocumentName({ documentName: response.data.document_title }));
+      dispatch(activeSelectedKeys({ selectedKeys: null }));
       dispatch(updateRefresKey());
-    });
+    } catch (error) {
+      // console.error('Error occurred during upload:', error);
+      if (error.status === 402) {
+        notification.config({
+          duration: 10
+        });
+
+        notification.info({
+          message: `Plan Limits Reached.`,
+          description: 'You reached your subscription limits, Please Upgrade to get more quotas.',
+          placement: 'bottomRight'
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

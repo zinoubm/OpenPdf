@@ -24,6 +24,8 @@ class Settings(BaseSettings):
             return v
         raise ValueError(v)
 
+    # DOMAIN: str
+    # FRONTEND_DOMAIN: str
     PROJECT_NAME: str
     SERVER_HOST: str
 
@@ -37,6 +39,12 @@ class Settings(BaseSettings):
     SECRET_ACCESS_KEY: str
     AWS_REGION: str
     AWS_BUCKET_NAME: str
+
+    STRIPE_PUBLISHABLE_KEY: str
+    STRIPE_SECRET_KEY: str
+    STRIPE_ENDPOINT_SECRET: str
+
+    CRON_JOB_SECRET_KEY: str
 
     @validator("SQLALCHEMY_DATABASE_URI", pre=True)
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:

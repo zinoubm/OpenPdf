@@ -163,7 +163,8 @@ const AuthLogin = () => {
                     size="large"
                     type="submit"
                     variant="contained"
-                    color="primary"
+                    // color="primary"
+                    sx={{ backgroundColor: 'black' }}
                   >
                     Login
                   </Button>

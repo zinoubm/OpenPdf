@@ -1,7 +1,5 @@
-// types
 import { createSlice } from '@reduxjs/toolkit';
 
-// initial state
 const initialState = {
   openItem: ['dashboard'],
   defaultId: 'dashboard',
@@ -9,8 +7,6 @@ const initialState = {
   drawerOpen: false,
   componentDrawerOpen: true
 };
-
-// ==============================|| SLICE - MENU ||============================== //
 
 const menu = createSlice({
   name: 'menu',

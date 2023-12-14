@@ -2,6 +2,8 @@ from typing import Any, List
 
 from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
+from fastapi.responses import HTMLResponse
+
 from pydantic.networks import EmailStr
 from sqlalchemy.orm import Session
 
@@ -128,6 +130,28 @@ def create_user_open(
     return user
 
 
+@router.post("/resend-verification-email", response_model=schemas.User)
+def resend_verfification_email(
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
+):
+    user = crud.user.get_by_email(db, email=current_user.email)
+    if user.is_verified:
+        raise HTTPException(
+            status_code=400,
+            detail="The user with this email is already verified",
+        )
+
+    email_verification_token = generate_email_verification_token(
+        email=current_user.email
+    )
+    send_verification_email(
+        email_to=current_user.email,
+        email=current_user.email,
+        token=email_verification_token,
+    )
+
+
 @router.get("/verify", response_model=schemas.Msg)
 def verify_user(
     token: str,
@@ -148,7 +172,22 @@ def verify_user(
     user.is_verified = True
     db.add(user)
     db.commit()
-    return {"msg": "User Verified successfully"}
+
+    html_content = """
+        <html>
+        <head>
+            <title>Email Verified</title>
+        </head>
+        <body>
+            <h1>Email verified successfully!</h1>
+            <p>Your email has been successfully verified, you can close this window.</p>
+            <!-- You can include additional content or UI elements here -->
+        </body>
+        </html>
+    """
+
+    return HTMLResponse(content=html_content, status_code=200)
+
 
 
 @router.get("/{user_id}", response_model=schemas.User)
