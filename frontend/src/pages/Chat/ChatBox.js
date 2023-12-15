@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 
 import { List, Input, Space, Button, Alert, Typography, Card, Popover } from 'antd';
 
@@ -56,9 +56,9 @@ const ChatBox = () => {
     dispatch(updateInputValue({ inputValue: e.target.value }));
   };
 
-  useEffect(() => {
-    if (isSuggestionsOpen === false && documentId != null) setIsSuggestionsOpen(true);
-  }, [documentId]);
+  // useEffect(() => {
+  //   if (isSuggestionsOpen === false && documentId != null) setIsSuggestionsOpen(true);
+  // }, [documentId]);
 
   return (
     <Card

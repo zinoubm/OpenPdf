@@ -271,7 +271,6 @@ def get_status(task_id):
     
 #     return {"document_id": document.id, "document_title": file_.multipart_filename}
 
-# Upload large documents
 @router.post("/upsert-stream")
 async def upsert_stream(
     request: Request,
@@ -340,6 +339,9 @@ async def upsert_stream(
             db=db, obj_in=document_in, user_id=current_user.id
         )
 
+        task = process_document.delay('my-document.pdf')
+        # return {"task_id": task.id}
+
     except Exception as e:
         crud.document.remove(db=db, id=document.id)
 
@@ -348,7 +350,7 @@ async def upsert_stream(
             detail="There was an error uploading the file",
         )
     
-    return {"document_id": document.id, "document_title": file_.multipart_filename}
+    return {"task_id": task.id, "document_id": document.id, "document_title": file_.multipart_filename}
     
 @router.get("/", response_model=List[schemas.Document])
 def read_documents(
@@ -390,8 +392,6 @@ def document_url(
             region_name=os.getenv("AWS_REGION"),
         )
         s3 = session.client("s3")
-
-        mimetype, _ = mimetypes.guess_type(document.title)
 
         object_key = (
             "documents"
@@ -584,8 +584,6 @@ def delete_document(
 
         bucket_name = os.getenv("AWS_BUCKET_NAME")
         s3 = session.client("s3")
-
-        mimetype, _ = mimetypes.guess_type(document.title)
 
         object_key = (
             "documents"
