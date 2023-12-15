@@ -115,8 +115,164 @@ def get_status(task_id):
 #     return UpsertResponse(id=document.id)
 
 
+# # Upload large documents
+# @router.post("/upsert-stream")
+# async def upsert_stream(
+#     request: Request,
+#     db: Session = Depends(deps.get_db),
+#     current_user: models.User = Depends(deps.get_current_active_user),
+# ):
+#     # limiter
+#     user_plan, plan_status = get_user_plan(db=db, user_id=current_user.id)
+#     if plan_status != "ACTIVE":
+#         raise HTTPException(
+#             status_code=402,
+#             detail=f"Your plan ({user_plan}) Is non active!",
+#         )
+
+#     user_limits = get_user_limits(user_plan)
+#     usage = crud.user.get_usage(db=db, user_id=current_user.id)
+
+#     if usage[FEATURES_ENUM.UPLOADS] + 1 > user_limits[FEATURES_ENUM.UPLOADS]:
+#         raise HTTPException(
+#             status_code=402,
+#             detail=f"Max {FEATURES_ENUM.UPLOADS} limit exeeded for the {user_plan} plan!",
+#         )
+
+#     crud.user.increment_usage(
+#         db=db, user_id=current_user.id, feature=FEATURES_ENUM.UPLOADS
+#     )
+
+#     # upload
+#     MAX_REQUEST_BODY_SIZE = settings.MAX_REQUEST_BODY_SIZE
+#     MAX_FILE_SIZE = settings.MAX_FILE_SIZE
+
+#     body_validator = MaxBodySizeValidator(MAX_REQUEST_BODY_SIZE)
+#     filename = request.headers.get("Filename")
+
+#     # document = crud.document.get(db=db, title=filename)
+
+#     # if document and document.user_id == current_user.id and document.title == filename:
+#     #     raise HTTPException(status_code=400, detail="document already exists")
+
+#     if not filename:
+#         raise HTTPException(
+#             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+#             detail="Filename header is missing",
+#         )
+    
+#     mimetype, _ = mimetypes.guess_type(filename)
+#     if mimetype != "application/pdf":
+#         raise HTTPException(
+#             status_code=415, detail="Openpdf Does Not Support Other Formats Yet!"
+#         )
+    
+#     try:
+#         filepath = os.path.join("/tmp", os.path.basename(filename))
+#         file_ = FileTarget(filepath, validator=MaxSizeValidator(MAX_FILE_SIZE))
+#         data = ValueTarget()
+#         parser = StreamingFormDataParser(headers=request.headers)
+#         parser.register("file", file_)
+#         parser.register("data", data)
+
+#         async for chunk in request.stream():
+#             body_validator(chunk)
+#             parser.data_received(chunk)
+
+#         session = boto3.Session(
+#             aws_access_key_id=os.getenv("ACCESS_KEY_ID"),
+#             aws_secret_access_key=os.getenv("SECRET_ACCESS_KEY"),
+#             region_name=os.getenv("AWS_REGION"),
+#         )
+
+#         s3 = session.client("s3")
+
+#         bucket_name = os.getenv("AWS_BUCKET_NAME")
+
+#         document_in = schemas.DocumentCreate(title=file_.multipart_filename)
+#         document = crud.document.create_with_user(
+#             db=db, obj_in=document_in, user_id=current_user.id
+#         )
+
+#         object_key = (
+#             "documents"
+#             + "/"
+#             + "doc"
+#             + "-"
+#             + str(document.id)
+#             + ".pdf"
+#         )
+
+#         # Upload the file to S3
+#         s3.upload_file(
+#             filepath,
+#             bucket_name,
+#             object_key,
+#             ExtraArgs={"ContentType": "application/pdf"},
+#         )
+
+#         # Upload vectors to qdrant
+#         chunks = get_document_from_file_stream(filepath)
+
+#         batch_size = 16
+#         current_batch = []
+
+
+#         for chunk in chunks:
+#             current_batch.append(chunk)
+
+#             # Check if the batch size is reached
+#             if len(current_batch) == batch_size:
+#                 ids = [uuid4().hex for batch_chunk in current_batch]
+#                 payloads = [
+#                     {
+#                         "user_id": current_user.id,
+#                         "document_id": document.id,
+#                         "chunk": batch_chunk,
+#                     }
+#                     for batch_chunk in current_batch
+#                 ]
+#                 try:
+#                     embeddings = openai_manager.get_embeddings(current_batch)
+#                     res = qdrant_manager.upsert_points(ids, payloads, embeddings)
+#                 except:
+#                     print("Couldn't get embeddings")
+
+#                 current_batch = []
+
+#         if current_batch:
+#             ids = [uuid4().hex for batch_chunk in current_batch]
+#             payloads = [
+#                 {
+#                     "user_id": current_user.id,
+#                     "document_id": document.id,
+#                     "chunk": batch_chunk,
+#                 }
+#                 for batch_chunk in current_batch
+#             ]
+
+#             try:
+#                 embeddings = openai_manager.get_embeddings(current_batch)
+#                 res = qdrant_manager.upsert_points(ids, payloads, embeddings)
+#             except:
+#                 print("Couldn't get embeddings")
+
+#     except Exception as e:
+#         crud.document.remove(db=db, id=document.id)
+#         qdrant_manager.delete_points(user_id=current_user.id, document_id=document.id)
+#         s3.delete_object(Bucket=bucket_name, Key=object_key)
+
+#         print(chunks)
+
+#         raise HTTPException(
+#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#             detail="There was an error uploading the file",
+#         )
+    
+#     return {"document_id": document.id, "document_title": file_.multipart_filename}
+
 # Upload large documents
-@router.post("/upsert-stream-legacy")
+@router.post("/upsert-stream")
 async def upsert_stream(
     request: Request,
     db: Session = Depends(deps.get_db),
@@ -179,90 +335,13 @@ async def upsert_stream(
             body_validator(chunk)
             parser.data_received(chunk)
 
-        session = boto3.Session(
-            aws_access_key_id=os.getenv("ACCESS_KEY_ID"),
-            aws_secret_access_key=os.getenv("SECRET_ACCESS_KEY"),
-            region_name=os.getenv("AWS_REGION"),
-        )
-
-        s3 = session.client("s3")
-
-        bucket_name = os.getenv("AWS_BUCKET_NAME")
-
         document_in = schemas.DocumentCreate(title=file_.multipart_filename)
         document = crud.document.create_with_user(
             db=db, obj_in=document_in, user_id=current_user.id
         )
 
-        object_key = (
-            "documents"
-            + "/"
-            + "doc"
-            + "-"
-            + str(document.id)
-            + ".pdf"
-        )
-
-        # Upload the file to S3
-        s3.upload_file(
-            filepath,
-            bucket_name,
-            object_key,
-            ExtraArgs={"ContentType": "application/pdf"},
-        )
-
-        # Upload vectors to qdrant
-        chunks = get_document_from_file_stream(filepath)
-
-        batch_size = 16
-        current_batch = []
-
-
-        for chunk in chunks:
-            current_batch.append(chunk)
-
-            # Check if the batch size is reached
-            if len(current_batch) == batch_size:
-                ids = [uuid4().hex for batch_chunk in current_batch]
-                payloads = [
-                    {
-                        "user_id": current_user.id,
-                        "document_id": document.id,
-                        "chunk": batch_chunk,
-                    }
-                    for batch_chunk in current_batch
-                ]
-                try:
-                    embeddings = openai_manager.get_embeddings(current_batch)
-                    res = qdrant_manager.upsert_points(ids, payloads, embeddings)
-                except:
-                    print("Couldn't get embeddings")
-
-                current_batch = []
-
-        if current_batch:
-            ids = [uuid4().hex for batch_chunk in current_batch]
-            payloads = [
-                {
-                    "user_id": current_user.id,
-                    "document_id": document.id,
-                    "chunk": batch_chunk,
-                }
-                for batch_chunk in current_batch
-            ]
-
-            try:
-                embeddings = openai_manager.get_embeddings(current_batch)
-                res = qdrant_manager.upsert_points(ids, payloads, embeddings)
-            except:
-                print("Couldn't get embeddings")
-
     except Exception as e:
         crud.document.remove(db=db, id=document.id)
-        qdrant_manager.delete_points(user_id=current_user.id, document_id=document.id)
-        s3.delete_object(Bucket=bucket_name, Key=object_key)
-
-        print(chunks)
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
