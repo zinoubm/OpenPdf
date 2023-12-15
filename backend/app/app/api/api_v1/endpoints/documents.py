@@ -7,11 +7,11 @@ from starlette.requests import ClientDisconnect
 
 from typing import Any, List
 from uuid import uuid4
-import logging
+# import logging
 import mimetypes
 from sqlalchemy.orm import Session
 
-from app.schemas.document import UpsertResponse
+# from app.schemas.document import UpsertResponse
 from app.parser.parser import get_document_from_file_stream
 from app.parser.chunk import chunk_text
 
@@ -30,13 +30,33 @@ from streaming_form_data.targets import FileTarget, ValueTarget
 from streaming_form_data.validators import MaxSizeValidator
 import streaming_form_data
 
+from app.worker import process_document
+from celery.result import AsyncResult
+
+
 import boto3
 from botocore.exceptions import ClientError
 import os
 
-from .exeptions import MaxBodySizeException, MaxBodySizeValidator
+from .exeptions import MaxBodySizeValidator
 
 router = APIRouter()
+
+@router.get('/upload_celery')
+async def upload_celery():
+    task = process_document.delay('my-document.pdf')
+    return {"task_id": task.id}
+
+@router.get("/{task_id}")
+def get_status(task_id):
+    task_result = AsyncResult(task_id)
+    result = {
+        "task_id": task_id,
+        "task_status": task_result.status,
+        "task_result": task_result.result
+    }
+    return {'result': result}
+
 
 
 # @router.post(
@@ -95,9 +115,8 @@ router = APIRouter()
 #     return UpsertResponse(id=document.id)
 
 
-# celery
 # Upload large documents
-@router.post("/upsert-stream")
+@router.post("/upsert-stream-legacy")
 async def upsert_stream(
     request: Request,
     db: Session = Depends(deps.get_db),
@@ -251,8 +270,7 @@ async def upsert_stream(
         )
     
     return {"document_id": document.id, "document_title": file_.multipart_filename}
-
-
+    
 @router.get("/", response_model=List[schemas.Document])
 def read_documents(
     db: Session = Depends(deps.get_db),
