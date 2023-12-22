@@ -26,8 +26,6 @@ services:
     environment:
       - TIMEOUT="2000"
       - SERVER_NAME=${DOMAIN?Variable not set}
-      # - SERVER_HOST=https://${DOMAIN?Variable not set}
-      # Allow explicit env var override for tests
       - SMTP_HOST=${SMTP_HOST}
     build:
       context: ./backend
@@ -36,6 +34,7 @@ services:
         INSTALL_DEV: ${INSTALL_DEV-false}
     volumes:
       - ./backend/app:/app
+      - app-shared-data:/tmp
 
   celery:
     image: celery:latest
@@ -44,16 +43,13 @@ services:
       - redis
     env_file:
       - .env
-    # environment:
-    # - SERVER_NAME=${DOMAIN?Variable not set}
-    # - SERVER_HOST=https://${DOMAIN?Variable not set}
-    # # Allow explicit env var override for tests
-    # - SMTP_HOST=${SMTP_HOST?Variable not set}
     build:
       context: ./backend
       dockerfile: celery.dockerfile
       args:
         INSTALL_DEV: ${INSTALL_DEV-false}
+    volumes:
+      - app-shared-data:/tmp
 
   frontend:
     build:
@@ -68,3 +64,4 @@ services:
 
 volumes:
   app-db-data:
+  app-shared-data:

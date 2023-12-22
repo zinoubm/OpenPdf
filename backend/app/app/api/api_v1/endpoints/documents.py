@@ -319,7 +319,7 @@ async def upsert_stream(
     mimetype, _ = mimetypes.guess_type(filename)
     if mimetype != "application/pdf":
         raise HTTPException(
-            status_code=415, detail="Openpdf Does Not Support Other Formats Yet!"
+            status_code=415, detail="OpenPdfAI Does Not Support Other Formats Yet!"
         )
     
     try:
@@ -339,10 +339,10 @@ async def upsert_stream(
             db=db, obj_in=document_in, user_id=current_user.id
         )
 
-        task = process_document.delay('my-document.pdf')
-        # return {"task_id": task.id}
+        task = process_document.delay(current_user.id, document.id, filepath)
 
     except Exception as e:
+        print(e)
         crud.document.remove(db=db, id=document.id)
 
         raise HTTPException(
