@@ -1,29 +1,13 @@
-# Enter Postgres DB
-sudo docker exec -it openpdf-db-1 psql -U postgres -d app
+message = "updating db schema"
 
-# Migreate Postgres DB
-sudo docker exec -it openpdf-backend-1 alembic upgrade head
+db_connect:
+	sudo docker exec -it openpdf-db-1 psql -U postgres -d app
 
-# Generate migrations 
-sudo docker exec -it openpdf-backend-1 alembic revision --autogenerate -m "Add column last_name to User model"
+migrate:
+	sudo docker exec -it openpdf-backend-1 alembic upgrade head
 
-# run tests
-sudo docker-compose exec backend bash /app/tests-start.sh -x
+generate_migration:
+	sudo docker exec -it openpdf-backend-1 alembic revision --autogenerate -m "${message}"
 
-# react test user
-"password": "12341234",
-"email": "test@example.com",
-
-# non verified test user
-"password": "12341234",
-"email": "nonverified@example.com",
-
-# free stripe test account
-"password": "12341234",
-"email": "freestripe2@test.com",
-
-# this is a dummy comment
-# open source reference https://demo-erp-crm.idurarapp.com/
-
-info@salesforza.com
-rwLBFMNw84zzViB
+test:
+	sudo docker-compose exec backend bash /app/tests-start.sh -x

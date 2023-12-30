@@ -1,90 +1,42 @@
-import os
+# import os
 
-from fastapi import UploadFile
-import mimetypes
-import pdfplumber
-from textwrap3 import dedent
-from unidecode import unidecode
-import re
+# from fastapi import UploadFile
+# import mimetypes
+# import pdfplumber
+from pdfminer.layout import LAParams, LTTextBox #, LTTextLineHorizontal
+from pdfminer.pdfpage import PDFPage
+from pdfminer.pdfinterp import PDFResourceManager
+from pdfminer.pdfinterp import PDFPageInterpreter
+from pdfminer.converter import PDFPageAggregator
 
-# import logging
-from app.parser.parsers import *
+# from textwrap3 import dedent
+# from unidecode import unidecode
+# import re
 
+# from app.parser.parsers import *
 
-# async def get_document_from_file(file: UploadFile, temp_file_path="/tmp/temp_file"):
-#     mimetype = file.content_type
-#     stream = await file.read()
+def get_document_from_file_stream(file_path):
+    fp = open(file_path, 'rb')
+    rsrcmgr = PDFResourceManager()
+    laparams = LAParams()
+    device = PDFPageAggregator(rsrcmgr, laparams=laparams)
+    interpreter = PDFPageInterpreter(rsrcmgr, device)
+    pages = PDFPage.get_pages(fp, check_extractable=False)
 
-#     with open(temp_file_path, "wb") as file:
-#         file.write(stream)
+    for page_num, page in enumerate(pages, start=1):
+        interpreter.process_page(page)
+        layout = device.get_result()
 
-#     try:
-#         parsed_text = await extract_text_with_mimetype(temp_file_path, mimetype)
+        for paragraph in layout:
+            if isinstance(paragraph, LTTextBox):
+                b0, b1, b2, b3, text = paragraph.bbox[0], paragraph.bbox[1], paragraph.bbox[2], paragraph.bbox[3], paragraph.get_text()
 
-#     except Exception as e:
-#         os.remove(temp_file_path)
-#         raise Exception("Couldn't get document from file")
-
-#     os.remove(temp_file_path)
-
-#     return parsed_text
-
-
-# async def get_document_from_file_stream(file_path):
-#     try:
-#         parsed_text = await extract_text_with_mimetype(file_path)
-
-#     except Exception as e:
-#         os.remove(file_path)
-#         raise Exception("Couldn't get document from file")
-
-#     os.remove(file_path)
-
-#     return parsed_text
-
-def get_document_from_file_stream(file_path, max_size = 2000):
-    with pdfplumber.open(file_path) as pdf:
-        for page in pdf.pages:
-            page_text = page.extract_text()
-
-            # maybe should be removed
-            if page_text == '':
-                continue
-
-            paragraphs = dedent(page_text)
-            ascii_paragraphs = re.findall(r"[^.?!]+[(\.)?!]", unidecode(paragraphs))
-
-            chunck = ""
-            for sentence in ascii_paragraphs:
-                if len(chunck) + len(sentence) < max_size:
-                    chunck += sentence
-                else:
-                    yield chunck.strip()
-                    chunck = ""
-
-            if chunck.strip() is not None:
-                yield chunck.strip()
-
-
-# all parsers have to return generators from now on
-# async def extract_text_with_mimetype(file_path, mimetype=None):
-#     # logging.INFO(f"extracting text from file {file_path} and mimetype {mimetype}")
-#     if mimetype is None:
-#         mimetype, _ = mimetypes.guess_type(file_path)
-#         # logging.INFO(f"File Mimetype Is: {mimetype}")
-#     if mimetype is None:
-#         raise Exception("Unsupported file type")
-
-#     if mimetype == "application/pdf":
-#         parsed_text = PdfParser.parse(file_path)
-
-#     elif mimetype == "text/plain":
-#         parsed_text = TxtParser.parse(file_path)
-
-#     elif (
-#         mimetype
-#         == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-#     ):
-#         parsed_text = DocxParser.parse(file_path)
-
-#     return parsed_text
+                yield {
+                        "page":page_num,
+                        "text":text.strip(),
+                        "version":1,
+                        "b0":b0,
+                        "b1":b1,
+                        "b2":b2,
+                        "b3":b3
+                      }
