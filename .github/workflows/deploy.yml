@@ -30,7 +30,7 @@ jobs:
           ECR_REPOSITORY: backend
           IMAGE_TAG: v1
         run: |
-          docker build -f ./backend/backend.dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./backend/
+          docker build -f ./backend/backend.dockerfile -t $$IMAGE_TAG ./backend/
           docker push $ECR_REPOSITORY:$IMAGE_TAG
 
         # -----------------
