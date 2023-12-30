@@ -31,7 +31,7 @@ jobs:
           IMAGE_TAG: v1
         run: |
           docker build -f ./backend/backend.dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./backend/
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REPOSITORY:$IMAGE_TAG
 
         # -----------------
 
@@ -60,3 +60,6 @@ jobs:
       #     push: true
       #     tags: ${{steps.meta.outputs.tags}}
       #     labels: ${{steps.meta.outputs.labels}}
+
+#   docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
