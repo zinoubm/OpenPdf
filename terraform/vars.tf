@@ -22,6 +22,18 @@ variable "environment" {
   type        = string
 }
 
+variable "cpu_units" {
+  description = "Amount of CPU units for a single ECS task"
+  default     = 1024
+  type        = number
+}
+
+variable "memory" {
+  description = "Amount of memory in MB for a single ECS task"
+  default     = 4096
+  type        = number
+}
+
 # aws credentials
 variable "aws_access_key_id" {
   description = "AWS console access key"
@@ -113,14 +125,26 @@ variable "hash" {
 #   type        = string
 # }
 
-# variable "healthcheck_endpoint" {
-#   description = "Endpoint for ALB healthcheck"
-#   type        = string
-#   default     = "/"
-# }
+variable "healthcheck_endpoint" {
+  description = "Endpoint for ALB healthcheck"
+  type        = string
+  default     = "/api/v1/users/sanity"
+}
 
-# variable "healthcheck_matcher" {
-#   description = "HTTP status code matcher for healthcheck"
-#   type        = string
-#   default     = "200"
-# }
+variable "healthcheck_matcher" {
+  description = "HTTP status code matcher for healthcheck"
+  type        = string
+  default     = "200"
+}
+
+# cloudfront
+variable "retention_in_days" {
+  description = "Retention period for Cloudwatch logs"
+  default     = 7
+  type        = number
+}
+
+variable "env_vars" {
+  description = "List of env vars for production"
+  type = map(string)
+}

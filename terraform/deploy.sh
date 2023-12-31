@@ -8,7 +8,7 @@ cd terraform
 terraform init
 
 ## Generate Terraform plan file
-terraform plan -var hash=${HASH} -out=infrastructure.tf.plan
+terraform plan -var-file=".tfvars" -var hash=${HASH} -out=infrastructure.tf.plan
 
 ## Provision resources
 terraform apply -auto-approve infrastructure.tf.plan

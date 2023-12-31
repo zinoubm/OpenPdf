@@ -1,6 +1,7 @@
 include .env
 $(eval export $(shell sed -ne 's/ *#.*$$//; /./ s/=.*$$// p' .env))
 
+# provider secrets
 export TF_VAR_aws_access_key_id=$(ACCESS_KEY_ID)
 export TF_VAR_aws_secret_access_key=$(SECRET_ACCESS_KEY)
 export TF_VAR_region=$(AWS_REGION)
@@ -27,3 +28,7 @@ test:
 
 deploy:
 	./terraform/deploy.sh
+
+destroy:
+	cd ./terraform && terraform destroy -var hash=null -auto-approve
+	
