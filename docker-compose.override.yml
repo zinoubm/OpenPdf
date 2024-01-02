@@ -1,5 +1,4 @@
 services:
-
   pgadmin:
     ports:
       - "5050:5050"

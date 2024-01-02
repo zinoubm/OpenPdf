@@ -1,44 +1,24 @@
 import os
+import argparse
 
-from celery import Celery
 from app.core.config import settings
 from uuid import uuid4
 from app.openai.base import openai_manager
 from app.vectorstore.qdrant import qdrant_manager
 from app.parser.parser import get_document_from_file_stream
-import boto3
 
-celery = Celery(__name__)
-celery.conf.broker_url = settings.CELERY_BROKER_URL
-celery.conf.result_backend = settings.CELERY_RESULT_BACKEND
+def parse_arg():
+    """
+    This function parses command line arguments to this script
+    """
+    parser = argparse.ArgumentParser()
 
-def upload_s3(document_path, document_id):
-    session = boto3.Session(
-        aws_access_key_id=os.getenv("ACCESS_KEY_ID"),
-        aws_secret_access_key=os.getenv("SECRET_ACCESS_KEY"),
-        region_name=os.getenv("AWS_REGION"),
-    )
+    parser.add_argument("--user_id", type=int, default=1)
+    parser.add_argument("--document_id", type=int, default=2)
 
-    s3 = session.client("s3")
+    params = vars(parser.parse_args())
 
-    bucket_name = os.getenv("AWS_BUCKET_NAME")
-
-    object_key = (
-        "documents"
-        + "/"
-        + "doc"
-        + "-"
-        + str(document_id)
-        + ".pdf"
-    )
-
-    # Upload the file to S3
-    s3.upload_file(
-        document_path,
-        bucket_name,
-        object_key,
-        ExtraArgs={"ContentType": "application/pdf"},
-    )
+    return params
 
 def upload_batch(batch, user_id, document_id):
     ids = [uuid4().hex for batch_chunk in batch]
@@ -58,9 +38,9 @@ def upload_batch(batch, user_id, document_id):
     res = qdrant_manager.upsert_points(ids, payloads, embeddings)
 
 
-@celery.task(acks_late=True)
 def process_document(user_id: int, document_id: int, document_path: str) -> str:
-
+    # download s3 object
+    
     chuncks = get_document_from_file_stream(document_path)
     batch_size = 256
     current_batch = []
@@ -75,5 +55,8 @@ def process_document(user_id: int, document_id: int, document_path: str) -> str:
     if current_batch:
         upload_batch(batch=current_batch, user_id=user_id, document_id=document_id)
         
-    os.remove(document_path)
     return f"processing document {document_id}, with path {document_path} for user {user_id}"
+
+if __name__ == "__main__":
+    params = parse_arg()
+    print(f"local batch container is working with {params}")

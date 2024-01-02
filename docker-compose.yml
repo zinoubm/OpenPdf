@@ -15,8 +15,8 @@ services:
     env_file:
       - .env
 
-  redis:
-    image: redis:7-alpine
+  # redis:
+  #   image: redis:7-alpine
 
   backend:
     depends_on:
@@ -36,20 +36,20 @@ services:
       - ./backend/app:/app
       - app-shared-data:/tmp
 
-  celery:
-    image: celery:latest
-    depends_on:
-      - db
-      - redis
-    env_file:
-      - .env
-    build:
-      context: ./backend
-      dockerfile: celery.dockerfile
-      args:
-        INSTALL_DEV: ${INSTALL_DEV-false}
-    volumes:
-      - app-shared-data:/tmp
+  # celery:
+  #   image: celery:latest
+  #   depends_on:
+  #     - db
+  #     - redis
+  #   env_file:
+  #     - .env
+  #   build:
+  #     context: ./backend
+  #     dockerfile: celery.dockerfile
+  #     args:
+  #       INSTALL_DEV: ${INSTALL_DEV-false}
+  #   volumes:
+  #     - app-shared-data:/tmp
 
   frontend:
     build:

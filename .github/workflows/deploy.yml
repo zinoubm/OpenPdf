@@ -24,7 +24,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@62f4f872db3836360b72999f4b87f1ff13310f3a
 
-      - name: Build, tag, and push image to Amazon ECR
+      - name: Build, tag, and push backend Image to Amazon ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: openpdfai/backend
@@ -32,4 +32,14 @@ jobs:
 
         run: |
           docker build -f ./backend/backend.dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./backend/
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      - name: Build, tag, and push Queue Image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: openpdfai/queue
+          IMAGE_TAG: latest
+
+        run: |
+          docker build -f ./backend/batch.dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./backend/
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG

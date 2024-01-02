@@ -1,0 +1,8 @@
+services:
+  batch:
+    env_file:
+      - .env
+    build:
+      context: ./backend
+      dockerfile: batch.dockerfile
+    command: python app/worker.py --user_id 999 --document_id 999

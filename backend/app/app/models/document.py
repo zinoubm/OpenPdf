@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 from datetime import datetime
 
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, Boolean, ForeignKey, Integer, String
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from sqlalchemy.sql.functions import func
@@ -21,5 +21,6 @@ class Document(Base):
     uploaded_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
+    is_processed: bool = Column(Boolean(), default=False)
     user_id = Column(Integer, ForeignKey("user.id"))
     user: Mapped["User"] = relationship("User", back_populates="documents")

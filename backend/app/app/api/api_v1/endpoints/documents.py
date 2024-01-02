@@ -97,7 +97,6 @@ async def upsert_stream(
             db=db, obj_in=document_in, user_id=current_user.id
         )
 
-        task = process_document.delay(current_user.id, document.id, filepath)
 
         session = boto3.Session(
         aws_access_key_id=os.getenv("ACCESS_KEY_ID"),
@@ -126,16 +125,20 @@ async def upsert_stream(
             ExtraArgs={"ContentType": "application/pdf"},
         )
 
+        # trigger aws batch job
+        
     except Exception as e:
+        # remove later
         print(e)
         crud.document.remove(db=db, id=document.id)
+        # delete s3 object in case of failure
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="There was an error uploading the file",
         )
     
-    return {"task_id": task.id, "document_id": document.id, "document_title": file_.multipart_filename}
+    return {"document_id": document.id, "document_title": file_.multipart_filename}
     
 @router.get("/", response_model=List[schemas.Document])
 def read_documents(
