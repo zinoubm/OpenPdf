@@ -32,6 +32,7 @@ resource "aws_ecs_task_definition" "default" {
                 "https://www.openpdfai.com"
               ])
             },
+
             {
               name  = "AWS_BATCH_JOB_QUEUE_ARN"
               value = aws_batch_job_queue.batch.arn
@@ -39,7 +40,11 @@ resource "aws_ecs_task_definition" "default" {
             {
               name  = "AWS_BATCH_JOB_DEFINITION_ARN"
               value = aws_batch_job_definition.batch.arn
-            }
+            },
+            {
+              name  = "POSTGRES_SERVER"
+              value = aws_db_instance.openpdfai_db.endpoint
+            },
           ]
         )
         

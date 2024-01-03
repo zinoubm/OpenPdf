@@ -24,6 +24,21 @@ resource "aws_security_group" "ecs_container_instance" {
   }
 }
 
+resource "aws_security_group" "rds_postgres" {
+  vpc_id = aws_vpc.default.id
+
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name     = "${var.namespace}_rds_postgres_security_group_${var.environment}"
+ }
+}
+
 resource "aws_security_group" "alb" {
   name        = "${var.namespace}_alb_security_group_${var.environment}"
   description = "Security group for ALB"
