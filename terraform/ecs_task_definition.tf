@@ -31,6 +31,14 @@ resource "aws_ecs_task_definition" "default" {
                 "https://openpdf.vercel.app",
                 "https://www.openpdfai.com"
               ])
+            },
+            {
+              name  = "AWS_BATCH_JOB_QUEUE_ARN"
+              value = aws_batch_job_queue.batch.arn
+            },
+            {
+              name  = "AWS_BATCH_JOB_DEFINITION_ARN"
+              value = aws_batch_job_definition.batch.arn
             }
           ]
         )

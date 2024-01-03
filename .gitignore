@@ -4,6 +4,7 @@ docker-stack.yml
 poetry.lock
 openpdf-credentials.json
 
+todo.readme.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

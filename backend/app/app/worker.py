@@ -1,11 +1,10 @@
-import os
 import argparse
 
-from app.core.config import settings
 from uuid import uuid4
 from app.openai.base import openai_manager
 from app.vectorstore.qdrant import qdrant_manager
 from app.parser.parser import get_document_from_file_stream
+from app.aws.s3 import aws_s3_manager
 
 def parse_arg():
     """
@@ -39,13 +38,13 @@ def upload_batch(batch, user_id, document_id):
 
 
 def process_document(user_id: int, document_id: int, document_path: str) -> str:
-    # download s3 object
     
     chuncks = get_document_from_file_stream(document_path)
     batch_size = 256
     current_batch = []
 
     for chunk in chuncks:
+        print(f"Uploading batch for user {user_id}")
         current_batch.append(chunk)
 
         if len(current_batch) == batch_size:
@@ -59,4 +58,11 @@ def process_document(user_id: int, document_id: int, document_path: str) -> str:
 
 if __name__ == "__main__":
     params = parse_arg()
-    print(f"local batch container is working with {params}")
+    user_id, document_id = params["user_id"], params["document_id"]
+
+    object_key = f"documents/doc-{document_id}.pdf"  
+    document_path = aws_manager.download_s3_object(object_key = object_key)
+
+    process_document(user_id=user_id, document_id=document_id, document_path=document_path)
+
+    print(f"Document: {document_id}, Uploaded succefully")

@@ -34,8 +34,30 @@ resource "aws_batch_job_definition" "batch" {
   ]
   container_properties = jsonencode({
     command = ["echo", "test"]
-    image   = "zinoubm/batch"
+    image = "${aws_ecr_repository.queue.repository_url}:latest"
 
+    environment = concat(
+      [
+        for key, value in var.env_vars : {
+          name  = key
+          value = value
+        }
+      ],
+      [
+        {
+          name  = "BACKEND_CORS_ORIGINS"
+          value = jsonencode([
+            "http://localhost",
+            "http://localhost:3000",
+            "https://localhost",
+            "https://localhost:3000",
+            "https://openpdf.vercel.app",
+            "https://www.openpdfai.com"
+          ])
+        }
+      ]
+    )
+    
     fargatePlatformConfiguration = {
       platformVersion = "LATEST"
     }
