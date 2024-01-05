@@ -61,7 +61,7 @@ if __name__ == "__main__":
     user_id, document_id = params["user_id"], params["document_id"]
 
     object_key = f"documents/doc-{document_id}.pdf"  
-    document_path = aws_manager.download_s3_object(object_key = object_key)
+    document_path = aws_s3_manager.download_s3_object(object_key = object_key)
 
     process_document(user_id=user_id, document_id=document_id, document_path=document_path)
 
