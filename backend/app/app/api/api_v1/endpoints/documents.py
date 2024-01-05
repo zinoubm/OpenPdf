@@ -126,8 +126,8 @@ async def upsert_stream(
         
         if settings.ENVIRONMENT == 'prod':
             response = aws_batch_manager.run({
-                "user_id":current_user.id,
-                "document_id":document.id
+                "user_id":str(current_user.id),
+                "document_id":str(document.id)
             })
 
             print(response)
