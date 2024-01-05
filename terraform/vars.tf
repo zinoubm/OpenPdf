@@ -24,13 +24,13 @@ variable "environment" {
 
 variable "cpu_units" {
   description = "Amount of CPU units for a single ECS task"
-  default     = 1024
+  default     = 512
   type        = number
 }
 
 variable "memory" {
   description = "Amount of memory in MB for a single ECS task"
-  default     = 4096
+  default     = 2048 
   type        = number
 }
 

@@ -42,6 +42,8 @@ class Settings(BaseSettings):
     SECRET_ACCESS_KEY: str
     AWS_REGION: str
     AWS_BUCKET_NAME: str
+    AWS_BATCH_JOB_QUEUE_ARN: str
+    AWS_BATCH_JOB_DEFINITION_ARN: str
 
     STRIPE_PUBLISHABLE_KEY: str
     STRIPE_SECRET_KEY: str
