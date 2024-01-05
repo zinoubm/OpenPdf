@@ -54,7 +54,15 @@ resource "aws_batch_job_definition" "batch" {
             "https://openpdf.vercel.app",
             "https://www.openpdfai.com"
           ])
-        }
+        },
+        {
+          name  = "AWS_BATCH_JOB_QUEUE_ARN"
+          value = "non_used"
+        },
+        {
+          name  = "AWS_BATCH_JOB_DEFINITION_ARN"
+          value = "non_used"
+        },
       ]
     )
     
