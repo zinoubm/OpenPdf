@@ -19,8 +19,7 @@ from streaming_form_data import StreamingFormDataParser
 from streaming_form_data.targets import FileTarget, ValueTarget
 from streaming_form_data.validators import MaxSizeValidator
 
-from app.worker import process_document
-# from celery.result import AsyncResult
+from app.aws.batch import aws_batch_manager
 
 import boto3
 from botocore.exceptions import ClientError
@@ -124,8 +123,12 @@ async def upsert_stream(
             object_key,
             ExtraArgs={"ContentType": "application/pdf"},
         )
-
-        # trigger aws batch job
+        
+        if settings.ENVIRONMENT == 'prod':
+            aws_batch_manager.run({
+                "user_id":current_user.id,
+                "document_id":document.id
+            })
         
     except Exception as e:
         # remove later

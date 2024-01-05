@@ -18,8 +18,16 @@ resource "aws_db_instance" "openpdfai_db" {
   username = var.env_vars["POSTGRES_USER"]
   password = var.env_vars["POSTGRES_PASSWORD"]
 
+  publicly_accessible = true
+
   vpc_security_group_ids = [aws_security_group.rds_postgres.id]
   db_subnet_group_name = aws_db_subnet_group.rds_postgres_subnet_group.name
 
-  skip_final_snapshot = true
+  backup_retention_period = 7 # Number of days to retain automated backups
+  backup_window = "03:00-04:00" # Preferred UTC backup window (hh24:mi-hh24:mi format)
+  maintenance_window = "mon:04:00-mon:04:30" # Preferred UTC maintenance window
+
+  # enable backup
+  skip_final_snapshot = false
+  final_snapshot_identifier = "db-snap"
 }

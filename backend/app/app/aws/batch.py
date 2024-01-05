@@ -5,8 +5,8 @@ from itertools import chain
 
 class AwsBatchManager():
     def __init__(self) -> None:
-        self.job_queue = JOB_QUEUE
-        self.job_definition = JOB_DEFINITION
+        self.job_queue = settings.AWS_BATCH_JOB_QUEUE_ARN
+        self.job_definition = settings.AWS_BATCH_JOB_DEFINITION_ARN
 
         self.session = boto3.Session(
         aws_access_key_id=settings.ACCESS_KEY_ID,
@@ -17,7 +17,7 @@ class AwsBatchManager():
         self.client = self.session.client("batch")
         
 
-    def run(self, payload ,job_name='openpdfai', worker_file_path='app/worker.py'):
+    def run(self, payload ,job_name='process_openpdfai_document', worker_file_path='app/worker.py'):
         
         params = [[f"--{key}" ,value] for key, value in payload.items()]
 
@@ -35,7 +35,7 @@ class AwsBatchManager():
         )
                         
         except Exception as e:
-            return {"status":0, "error":e}
+            return {"failed":1, "error":e}
 
         return response
     

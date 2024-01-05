@@ -48,6 +48,7 @@ class Settings(BaseSettings):
     STRIPE_ENDPOINT_SECRET: str
 
     CRON_JOB_SECRET_KEY: str
+    ENVIRONMENT: str
 
     @validator("SQLALCHEMY_DATABASE_URI", pre=True)
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:

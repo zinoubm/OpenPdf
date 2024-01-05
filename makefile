@@ -14,6 +14,7 @@ export AWS_DEFAULT_REGION = $(TF_VAR_region)
 # default message for generated migration
 message = "updating db schema"
 
+# psql -U {user} -d {db name} -h {host} -p 5432
 db_connect:
 	sudo docker exec -it openpdf-db-1 psql -U postgres -d app
 
