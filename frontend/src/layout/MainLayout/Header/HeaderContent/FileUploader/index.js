@@ -10,7 +10,7 @@ import { useDispatch } from 'react-redux';
 import { activeDocumentId, activeDocumentName, updateRefresKey, activeSelectedKeys } from 'store/reducers/app';
 
 function FileUploader() {
-  const { uploadDocumentStream } = useApi();
+  const { uploadDocumentStream, uploadDocument } = useApi();
   const dispatch = useDispatch();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -18,7 +18,12 @@ function FileUploader() {
   const handleUpload = async ({ target }) => {
     setIsLoading(true);
     try {
-      const response = await uploadDocumentStream(target.files[0]);
+      let response;
+      if (process.env.REACT_APP_ENVIRONMENT === 'prod') {
+        response = await uploadDocumentStream(target.files[0]);
+      } else {
+        response = await uploadDocument(target.files[0]);
+      }
 
       dispatch(activeDocumentId({ documentId: response.data.document_id }));
       dispatch(activeDocumentName({ documentName: response.data.document_title }));

@@ -5,6 +5,7 @@ from fastapi.responses import StreamingResponse
 from typing import Any, List
 import mimetypes
 from sqlalchemy.orm import Session
+from app.schemas.document import UpsertResponse
 
 from app.openai.base import openai_manager
 from app.openai.core import ask, ask_stream, suggest_questions
@@ -14,6 +15,8 @@ from app.api import deps
 from app.core.config import settings
 from app.core.constants import FEATURES_ENUM
 from app.stripe.limiter import get_user_plan, get_user_limits
+
+from app.worker import upload_batch, process_document
 
 from streaming_form_data import StreamingFormDataParser
 from streaming_form_data.targets import FileTarget, ValueTarget
@@ -27,6 +30,76 @@ from botocore.exceptions import ClientError
 from .exeptions import MaxBodySizeValidator
 
 router = APIRouter()
+
+# used for local dev
+@router.post(
+    "/upsert",
+)
+async def upsert_file(
+    file: UploadFile = File(...),
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
+):
+    if not file:
+        print("There was a problem with file Upload")
+        raise HTTPException(status_code=500, detail="No File Recieved")
+
+    # Until openpdf supports more document formats
+    if file.content_type != "application/pdf":
+        print("OpenPdf only supports PDFs")
+        raise HTTPException(
+            status_code=415, detail="Openpdf Does Not Support Other Formats Yet!"
+        )
+    
+    filename = file.filename
+        
+    document_in = schemas.DocumentCreate(title=filename)
+    document = crud.document.create_with_user(
+        db=db, obj_in=document_in, user_id=current_user.id
+    )
+
+    # write file
+    temp_file_path="/tmp/temp_file"
+    stream = await file.read()
+
+    with open(temp_file_path, "wb") as file:
+        file.write(stream)
+
+
+    session = boto3.Session(
+    aws_access_key_id=os.getenv("ACCESS_KEY_ID"),
+    aws_secret_access_key=os.getenv("SECRET_ACCESS_KEY"),
+        region_name=os.getenv("AWS_REGION"),
+    )
+
+    s3 = session.client("s3")
+
+    bucket_name = os.getenv("AWS_BUCKET_NAME")
+
+    object_key = (
+        "documents"
+        + "/"
+        + "doc"
+        + "-"
+        + str(document.id)
+        + ".pdf"
+    )
+
+    # Upload the file to S3
+    s3.upload_file(
+        temp_file_path,
+        bucket_name,
+        object_key,
+        ExtraArgs={"ContentType": "application/pdf"},
+    )
+
+    res = process_document(user_id=current_user.id, document_id=document.id, document_path=temp_file_path)
+    print(res)
+
+    os.remove(temp_file_path)
+
+    return {"document_id": document.id, "document_title": filename}
+
 
 @router.post("/upsert-stream")
 async def upsert_stream(
