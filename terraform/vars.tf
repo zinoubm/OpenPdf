@@ -144,7 +144,7 @@ variable "retention_in_days" {
   type        = number
 }
 
-variable "env_vars" {
-  description = "List of env vars for production"
-  type = map(string)
-}
+# variable "env_vars" {
+#   description = "List of env vars for production"
+#   type = map(string)
+# }
