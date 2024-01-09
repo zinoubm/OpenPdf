@@ -4,19 +4,18 @@ resource "aws_db_subnet_group" "rds_postgres_subnet_group" {
 
   tags = {
     Name     = "${var.namespace}_rds_postgres_subnet_group_${var.environment}"
-
   }
 }
 
 resource "aws_db_instance" "openpdfai_db" {
   allocated_storage = 10
-  db_name = var.env_vars["POSTGRES_DB"]
+  db_name = var.POSTGRES_DB
   storage_type = "gp2"
   engine = "postgres"
   instance_class = "db.t3.micro"
   identifier = "openpdfai-db"
-  username = var.env_vars["POSTGRES_USER"]
-  password = var.env_vars["POSTGRES_PASSWORD"]
+  username = var.POSTGRES_USER
+  password = var.POSTGRES_PASSWORD
 
   publicly_accessible = true
 

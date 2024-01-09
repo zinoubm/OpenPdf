@@ -105,12 +105,12 @@ resource "aws_batch_job_definition" "batch" {
 
                   # aws
                   {
-                    name  = "AWS_ACCESS_KEY_ID"
-                    value = var.AWS_ACCESS_KEY_ID
+                    name  = "ACCESS_KEY_ID"
+                    value = var.ACCESS_KEY_ID
                   },
                   {
-                    name  = "AWS_SECRET_ACCESS_KEY"
-                    value = var.AWS_SECRET_ACCESS_KEY
+                    name  = "SECRET_ACCESS_KEY"
+                    value = var.SECRET_ACCESS_KEY
                   },
                   {
                     name  = "AWS_BUCKET_NAME"
