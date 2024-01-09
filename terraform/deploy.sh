@@ -12,5 +12,6 @@ terraform init
 terraform plan -var hash=${HASH} -out=infrastructure.tf.plan
 
 ## Provision resources
-terraform apply -auto-approve infrastructure.tf.plan
+# activate later
+# terraform apply -auto-approve infrastructure.tf.plan
 rm -rf infrastructure.tf.plan
