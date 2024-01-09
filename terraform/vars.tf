@@ -160,8 +160,8 @@ variable "POSTGRES_USER" {}
 variable "GOOGLE_CLIENT_ID" {}
 
 # aws
-variable "AWS_ACCESS_KEY_ID" {}
-variable "AWS_SECRET_ACCESS_KEY" {}
+variable "ACCESS_KEY_ID" {}
+variable "SECRET_ACCESS_KEY" {}
 variable "AWS_BUCKET_NAME" {}
 variable "AWS_REGION" {}
 
