@@ -47,11 +47,66 @@ jobs:
 
       - name: Deploy Terrafrom Rousourses
         env:
+          # terraform
           TF_VAR_aws_access_key_id: ${{secrets.AWS_ACCESS_KEY_ID}}
           TF_VAR_aws_secret_access_key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
           TF_VAR_region: ${{secrets.AWS_REGION}}
           TF_VAR_tld_zone_id: ${{secrets.AWS_DNS_ZONE_ID}}
           TF_VAR_ecs_task_desired_count: ${{secrets.ECS_TASK_DESIRED_COUNT}}
           TF_VAR_service_name: ${{secrets.SERVICE_NAME}}
+
+          # backend
+          TF_VAR_ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
+          TF_VAR_PROJECT_NAME: ${{ secrets.PROJECT_NAME }}
+          TF_VAR_SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          TF_VAR_DOMAIN: ${{ secrets.DOMAIN }}
+          TF_VAR_BACKEND_CORS_ORIGINS: ${{ secrets.BACKEND_CORS_ORIGINS }}
+          TF_VAR_FIRST_SUPERUSER: ${{ secrets.FIRST_SUPERUSER }}
+          TF_VAR_FIRST_SUPERUSER_PASSWORD: ${{ secrets.FIRST_SUPERUSER_PASSWORD }}
+          TF_VAR_EMAILS_FROM_EMAIL: ${{ secrets.EMAILS_FROM_EMAIL }}
+          TF_VAR_USERS_OPEN_REGISTRATION: ${{ secrets.USERS_OPEN_REGISTRATION }}
+          TF_VAR_SECRET_KEY: ${{ secrets.SECRET_KEY }}
+
+          # postgres
+          TF_VAR_POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          TF_VAR_POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          TF_VAR_POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+
+          # google
+          TF_VAR_GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+
+          # aws
+          TF_VAR_AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
+          TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
+          TF_VAR_AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
+          TF_VAR_AWS_REGION: ${{ secrets.AWS_REGION }}
+
+          # openai
+          TF_VAR_OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          TF_VAR_OPENAI_ORGANIZATION: ${{ secrets.OPENAI_ORGANIZATION }}
+
+          # qdrant
+          TF_VAR_COLLECTION_NAME: ${{ secrets.COLLECTION_NAME }}
+          TF_VAR_COLLECTION_SIZE: ${{ secrets.COLLECTION_SIZE }}
+          TF_VAR_QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
+          TF_VAR_QDRANT_HOST: ${{ secrets.QDRANT_HOST }}
+          TF_VAR_QDRANT_PORT: ${{ secrets.QDRANT_PORT }}
+          TF_VAR_QDRANT_URL: ${{ secrets.QDRANT_URL }}
+
+          # smtp
+          TF_VAR_MAILTRAP_API_KEY: ${{ secrets.MAILTRAP_API_KEY }}
+          TF_VAR_SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          TF_VAR_SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          TF_VAR_SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          TF_VAR_SMTP_TLS: ${{ secrets.SMTP_TLS }}
+          TF_VAR_SMTP_USER: ${{ secrets.SMTP_USER }}
+
+          # stripe
+          TF_VAR_STRIPE_ENDPOINT_SECRET: ${{ secrets.STRIPE_ENDPOINT_SECRET }}
+          TF_VAR_STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
+          TF_VAR_STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+
+          # cron-job
+          TF_VAR_CRON_JOB_SECRET_KEY: ${{ secrets.CRON_JOB_SECRET_KEY }}
 
         run: make deploy

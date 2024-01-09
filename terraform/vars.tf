@@ -119,12 +119,6 @@ variable "hash" {
 }
 
 # alb
-# variable "custom_origin_host_header" {
-#   description = "Custom header to ensure communication only through CloudFront"
-#   default     = "Demo123"
-#   type        = string
-# }
-
 variable "healthcheck_endpoint" {
   description = "Endpoint for ALB healthcheck"
   type        = string
@@ -144,7 +138,57 @@ variable "retention_in_days" {
   type        = number
 }
 
-# variable "env_vars" {
-#   description = "List of env vars for production"
-#   type = map(string)
-# }
+# service level
+# backend
+variable "ENVIRONMENT" {}
+variable "PROJECT_NAME" {}
+variable "SERVER_HOST" {}
+variable "DOMAIN" {}
+variable "BACKEND_CORS_ORIGINS" {}
+variable "FIRST_SUPERUSER" {}
+variable "FIRST_SUPERUSER_PASSWORD" {}
+variable "EMAILS_FROM_EMAIL" {}
+variable "USERS_OPEN_REGISTRATION" {}
+variable "SECRET_KEY" {}
+
+# postgres
+variable "POSTGRES_DB" {}
+variable "POSTGRES_PASSWORD" {}
+variable "POSTGRES_USER" {}
+
+# google
+variable "GOOGLE_CLIENT_ID" {}
+
+# aws
+variable "AWS_ACCESS_KEY_ID" {}
+variable "AWS_SECRET_ACCESS_KEY" {}
+variable "AWS_BUCKET_NAME" {}
+variable "AWS_REGION" {}
+
+# openai
+variable "OPENAI_API_KEY" {}
+variable "OPENAI_ORGANIZATION" {}
+
+# qdrant
+variable "COLLECTION_NAME" {}
+variable "COLLECTION_SIZE" {}
+variable "QDRANT_API_KEY" {}
+variable "QDRANT_HOST" {}
+variable "QDRANT_PORT" {}
+variable "QDRANT_URL" {}
+
+# smtp
+variable "MAILTRAP_API_KEY" {}
+variable "SMTP_HOST" {}
+variable "SMTP_PASSWORD" {}
+variable "SMTP_PORT" {}
+variable "SMTP_TLS" {}
+variable "SMTP_USER" {}
+
+# stripe
+variable "STRIPE_ENDPOINT_SECRET" {}
+variable "STRIPE_PUBLISHABLE_KEY" {}
+variable "STRIPE_SECRET_KEY" {}
+
+# cron-job
+variable "CRON_JOB_SECRET_KEY" {}

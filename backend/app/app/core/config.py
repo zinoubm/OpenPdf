@@ -29,8 +29,8 @@ class Settings(BaseSettings):
     PROJECT_NAME: str
     SERVER_HOST: str
 
-    CELERY_BROKER_URL: str
-    CELERY_RESULT_BACKEND: str
+    # CELERY_BROKER_URL: str
+    # CELERY_RESULT_BACKEND: str
 
     POSTGRES_SERVER: str
     POSTGRES_USER: str
