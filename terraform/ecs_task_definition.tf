@@ -173,13 +173,15 @@ resource "aws_ecs_task_definition" "default" {
                       name  = "STRIPE_SECRET_KEY"
                       value = var.STRIPE_SECRET_KEY
                     },
-
-                    # cron-job
+                    # services secrets
                     {
                       name  = "CRON_JOB_SECRET_KEY"
                       value = var.CRON_JOB_SECRET_KEY
                     },
-
+                    {
+                      name  = "DOCUMENT_PORECESSOR_SECRETE_KEY"
+                      value = var.CRON_JOB_SECRET_KEY
+                    },
                     # batch
                     {
                       name  = "AWS_BATCH_JOB_QUEUE_ARN"
@@ -190,8 +192,8 @@ resource "aws_ecs_task_definition" "default" {
                       value = aws_batch_job_definition.batch.arn
                     },
                     ]
-        
-        
+
+
       portMappings = [
         {
           containerPort = var.container_port

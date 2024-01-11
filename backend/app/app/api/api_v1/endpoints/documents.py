@@ -14,17 +14,20 @@ from app import crud, models, schemas
 from app.api import deps
 from app.core.config import settings
 from app.core.constants import FEATURES_ENUM
+from app.core.security import verify_password
 from app.stripe.limiter import get_user_plan, get_user_limits
 
-from app.worker import upload_batch, process_document
+from app.parser.parser import process_document
+from app.parser.parser import get_number_of_pages
 
 from streaming_form_data import StreamingFormDataParser
 from streaming_form_data.targets import FileTarget, ValueTarget
 from streaming_form_data.validators import MaxSizeValidator
 
 from app.aws.batch import aws_batch_manager
+from app.aws.s3 import aws_s3_manager
 
-import boto3
+# import boto3
 from botocore.exceptions import ClientError
 
 from .exeptions import MaxBodySizeValidator
@@ -52,51 +55,23 @@ async def upsert_file(
         )
     
     filename = file.filename
-        
+    temp_file_path="/tmp/temp_file"
+    stream = await file.read()
+    with open(temp_file_path, "wb") as file:
+        file.write(stream)
+
     document_in = schemas.DocumentCreate(title=filename)
     document = crud.document.create_with_user(
         db=db, obj_in=document_in, user_id=current_user.id
     )
+        
+    aws_s3_manager.upload_s3_object(file_path=temp_file_path, document_id=document.id)
 
-    # write file
-    temp_file_path="/tmp/temp_file"
-    stream = await file.read()
+    process_document(user_id=current_user.id, document_id=document.id, document_path=temp_file_path)
 
-    with open(temp_file_path, "wb") as file:
-        file.write(stream)
-
-
-    session = boto3.Session(
-    aws_access_key_id=os.getenv("ACCESS_KEY_ID"),
-    aws_secret_access_key=os.getenv("SECRET_ACCESS_KEY"),
-        region_name=os.getenv("AWS_REGION"),
-    )
-
-    s3 = session.client("s3")
-
-    bucket_name = os.getenv("AWS_BUCKET_NAME")
-
-    object_key = (
-        "documents"
-        + "/"
-        + "doc"
-        + "-"
-        + str(document.id)
-        + ".pdf"
-    )
-
-    # Upload the file to S3
-    s3.upload_file(
-        temp_file_path,
-        bucket_name,
-        object_key,
-        ExtraArgs={"ContentType": "application/pdf"},
-    )
-
-    res = process_document(user_id=current_user.id, document_id=document.id, document_path=temp_file_path)
-    print(res)
-
-    os.remove(temp_file_path)
+    # set processed true
+    updated_document_in = schemas.DocumentUpdate(is_processed=True)
+    crud.document.update(db=db, db_obj=document, obj_in=updated_document_in)
 
     return {"document_id": document.id, "document_title": filename}
 
@@ -153,8 +128,8 @@ async def upsert_stream(
         )
     
     try:
-        filepath = os.path.join("/tmp", os.path.basename(filename))
-        file_ = FileTarget(filepath, validator=MaxSizeValidator(MAX_FILE_SIZE))
+        temp_file_path = os.path.join("/tmp", os.path.basename(filename))
+        file_ = FileTarget(temp_file_path, validator=MaxSizeValidator(MAX_FILE_SIZE))
         data = ValueTarget()
         parser = StreamingFormDataParser(headers=request.headers)
         parser.register("file", file_)
@@ -169,47 +144,26 @@ async def upsert_stream(
             db=db, obj_in=document_in, user_id=current_user.id
         )
 
+        aws_s3_manager.upload_s3_object(file_path=temp_file_path, document_id=document.id)
 
-        session = boto3.Session(
-        aws_access_key_id=os.getenv("ACCESS_KEY_ID"),
-        aws_secret_access_key=os.getenv("SECRET_ACCESS_KEY"),
-            region_name=os.getenv("AWS_REGION"),
-        )
-
-        s3 = session.client("s3")
-
-        bucket_name = os.getenv("AWS_BUCKET_NAME")
-
-        object_key = (
-            "documents"
-            + "/"
-            + "doc"
-            + "-"
-            + str(document.id)
-            + ".pdf"
-        )
-
-        # Upload the file to S3
-        s3.upload_file(
-            filepath,
-            bucket_name,
-            object_key,
-            ExtraArgs={"ContentType": "application/pdf"},
-        )
+        pages_number = get_number_of_pages(temp_file_path)
         
-        if settings.ENVIRONMENT == 'prod':
+        if pages_number <= 30:
+            process_document(user_id=current_user.id, document_id=document.id, document_path=temp_file_path)
+
+            # set processed true
+            updated_document_in = schemas.DocumentUpdate(is_processed=True)
+            crud.document.update(db=db, db_obj=document, obj_in=updated_document_in)
+
+        elif settings.ENVIRONMENT == 'prod':
             response = aws_batch_manager.run({
                 "user_id":str(current_user.id),
                 "document_id":str(document.id)
             })
-
-            print(response)
         
     except Exception as e:
-        # remove later
-        print(e)
         crud.document.remove(db=db, id=document.id)
-        # delete s3 object in case of failure
+        aws_s3_manager.delete_s3_object(document_id=document.id)
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -237,6 +191,37 @@ def read_documents(
 
     return documents
 
+@router.get("/status")
+def get_document_status(
+    document_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
+):
+    document = crud.document.get(db=db, id=document_id)
+
+    if not document:
+        raise HTTPException(status_code=404, detail="Document not found")
+    if document.user_id != current_user.id:
+        raise HTTPException(status_code=400, detail="Not enough permissions")
+
+    return {"status" : document.is_processed}
+
+@router.put("/status")
+def set_document_status(
+    secret: str,
+    document_id: int,
+    db: Session = Depends(deps.get_db),
+):
+    if secret != settings.DOCUMENT_PORECESSOR_SECRETE_KEY:
+        raise HTTPException(
+            status_code=403, detail="You Don't have the premission requred!"
+        )
+
+    document = crud.document.get(db=db, id=document_id)
+    document_in = schemas.DocumentUpdate(is_processed=True)
+    crud.document.update(db=db, db_obj=document, obj_in=document_in)
+    return document_id
+
 
 @router.get("/document-url")
 def document_url(
@@ -252,30 +237,7 @@ def document_url(
         raise HTTPException(status_code=400, detail="Not enough permissions")
 
     try:
-        session = boto3.Session(
-            aws_access_key_id=settings.ACCESS_KEY_ID,
-            aws_secret_access_key=settings.SECRET_ACCESS_KEY,
-            region_name=settings.AWS_REGION,
-        )
-        s3 = session.client("s3")
-
-        object_key = (
-            "documents"
-            + "/"
-            + "doc"
-            + "-"
-            + str(document.id)
-            + ".pdf"
-        )
-
-        url = s3.generate_presigned_url(
-            ClientMethod="get_object",
-            Params={
-                "Bucket": os.getenv("AWS_BUCKET_NAME"),
-                "Key": object_key,
-            },
-            ExpiresIn=10000,
-        )
+        url = aws_s3_manager.get_s3_object_presigned_url(document_id=document.id)
 
     except ClientError:
         print("couldn't get document url")
@@ -431,36 +393,21 @@ def delete_document(
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
-    Delete an document.
+    Delete a document.
     """
     document = crud.document.get(db=db, id=id)
+
     if not document:
         raise HTTPException(status_code=404, detail="Document not found")
+    
     if not crud.user.is_superuser(current_user) and (
         document.user_id != current_user.id
     ):
         raise HTTPException(status_code=400, detail="Not enough permissions")
+    
     try:
         qdrant_manager.delete_points(user_id=current_user.id, document_id=id)
-        session = boto3.Session(
-            aws_access_key_id=os.getenv("ACCESS_KEY_ID"),
-            aws_secret_access_key=os.getenv("SECRET_ACCESS_KEY"),
-            region_name=os.getenv("AWS_REGION"),
-        )
-
-        bucket_name = os.getenv("AWS_BUCKET_NAME")
-        s3 = session.client("s3")
-
-        object_key = (
-            "documents"
-            + "/"
-            + "doc"
-            + "-"
-            + str(document.id)
-            + ".pdf"
-        )
-
-        s3.delete_object(Bucket=bucket_name, Key=object_key)
+        aws_s3_manager.delete_s3_object(document_id=document.id)
 
     except Exception as e:
         raise HTTPException(

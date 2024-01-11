@@ -16,6 +16,7 @@ class DocumentCreate(DocumentBase):
 
 # Properties to receive on item update
 class DocumentUpdate(DocumentBase):
+    is_processed: bool
     pass
 
 

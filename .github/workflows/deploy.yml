@@ -105,7 +105,8 @@ jobs:
           TF_VAR_STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
           TF_VAR_STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
 
-          # cron-job
+          # services secrets
           TF_VAR_CRON_JOB_SECRET_KEY: ${{ secrets.CRON_JOB_SECRET_KEY }}
+          TF_VAR_DOCUMENT_PORECESSOR_SECRETE_KEY: ${{ secrets.DOCUMENT_PORECESSOR_SECRETE_KEY }}
 
         run: make deploy

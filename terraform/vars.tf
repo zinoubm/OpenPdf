@@ -192,3 +192,4 @@ variable "STRIPE_SECRET_KEY" {}
 
 # cron-job
 variable "CRON_JOB_SECRET_KEY" {}
+variable "DOCUMENT_PORECESSOR_SECRETE_KEY" {}

@@ -1,8 +1,8 @@
 import os
 import re
-from app.parser.parsers.pdf import PdfParser
-from app.parser.parsers.txt import TxtParser
-from app.parser.parsers.docx import DocxParser
+from app.parser.converters.pdf import PdfParser
+from app.parser.converters.txt import TxtParser
+from app.parser.converters.docx import DocxParser
 
 
 from app.tests.parser.data import dummy_docx, dummy_pdf, dummy_txt

@@ -196,10 +196,13 @@ resource "aws_batch_job_definition" "batch" {
                     name  = "STRIPE_SECRET_KEY"
                     value = var.STRIPE_SECRET_KEY
                   },
-
-                  # cron-job
+                  # services secrets
                   {
                     name  = "CRON_JOB_SECRET_KEY"
+                    value = var.CRON_JOB_SECRET_KEY
+                  },
+                  {
+                    name  = "DOCUMENT_PORECESSOR_SECRETE_KEY"
                     value = var.CRON_JOB_SECRET_KEY
                   },
 

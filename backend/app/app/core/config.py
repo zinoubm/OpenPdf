@@ -24,7 +24,7 @@ class Settings(BaseSettings):
             return v
         raise ValueError(v)
 
-    # DOMAIN: str
+    DOMAIN: str
     # FRONTEND_DOMAIN: str
     PROJECT_NAME: str
     SERVER_HOST: str
@@ -50,6 +50,7 @@ class Settings(BaseSettings):
     STRIPE_ENDPOINT_SECRET: str
 
     CRON_JOB_SECRET_KEY: str
+    DOCUMENT_PORECESSOR_SECRETE_KEY: str
     ENVIRONMENT: str
 
     @validator("SQLALCHEMY_DATABASE_URI", pre=True)

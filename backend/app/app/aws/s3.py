@@ -25,7 +25,54 @@ class AwsS3Manager:
         return dest_path
 
 
-    def upload_s3_object(self):
-        pass
+    def upload_s3_object(self, file_path, document_id):
+        object_key = (
+            "documents"
+            + "/"
+            + "doc"
+            + "-"
+            + str(document_id)
+            + ".pdf"
+        )
+
+        self.s3_client.upload_file(
+            file_path,
+            self.bucket_name,
+            object_key,
+            ExtraArgs={"ContentType": "application/pdf"},
+        )
+
+    def get_s3_object_presigned_url(self, document_id):
+        object_key = (
+            "documents"
+            + "/"
+            + "doc"
+            + "-"
+            + str(document_id)
+            + ".pdf"
+        )
+
+        url = self.s3_client.generate_presigned_url(
+            ClientMethod="get_object",
+            Params={
+                "Bucket": self.bucket_name,
+                "Key": object_key,
+            },
+            ExpiresIn=10000,
+        )
+        
+        return url
+
+    def delete_s3_object(self, document_id):
+        object_key = (
+            "documents"
+            + "/"
+            + "doc"
+            + "-"
+            + str(document_id)
+            + ".pdf"
+        )
+
+        self.s3_client.delete_object(Bucket=self.bucket_name, Key=object_key)
 
 aws_s3_manager = AwsS3Manager()
