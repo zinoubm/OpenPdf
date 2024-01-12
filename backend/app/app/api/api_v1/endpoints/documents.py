@@ -2,7 +2,7 @@ import os
 
 from fastapi import APIRouter, Request, Depends, HTTPException, UploadFile, File, status
 from fastapi.responses import StreamingResponse
-from typing import Any, List
+from typing import List
 import mimetypes
 from sqlalchemy.orm import Session
 from app.schemas.document import UpsertResponse
@@ -14,7 +14,6 @@ from app import crud, models, schemas
 from app.api import deps
 from app.core.config import settings
 from app.core.constants import FEATURES_ENUM
-from app.core.security import verify_password
 from app.stripe.limiter import get_user_plan, get_user_limits
 
 from app.parser.parser import process_document
@@ -34,6 +33,7 @@ from .exeptions import MaxBodySizeValidator
 
 router = APIRouter()
 
+# actually remove this and use documents less than 30 pages in development
 # used for local dev
 @router.post(
     "/upsert",
@@ -178,10 +178,7 @@ def read_documents(
     skip: int = 0,
     limit: int = 100,
     current_user: models.User = Depends(deps.get_current_active_user),
-) -> Any:
-    """
-    Retrieve documents.
-    """
+):
     if crud.user.is_superuser(current_user):
         documents = crud.document.get_multi(db, skip=skip, limit=limit)
     else:
@@ -391,10 +388,7 @@ def delete_document(
     db: Session = Depends(deps.get_db),
     id: int,
     current_user: models.User = Depends(deps.get_current_active_user),
-) -> Any:
-    """
-    Delete a document.
-    """
+):
     document = crud.document.get(db=db, id=id)
 
     if not document:

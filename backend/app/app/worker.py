@@ -27,11 +27,12 @@ if __name__ == "__main__":
     process_document(user_id=user_id, document_id=document_id, document_path=document_path)
     
     # todo: test later In production
-    url = 'http://api.openpdfai.com/api/v1/documents/status'
+    url = 'https://api.openpdfai.com/api/v1/documents/status'
     params = {'secret': settings.DOCUMENT_PORECESSOR_SECRETE_KEY, 'document_id': document_id}
 
     headers = {'accept': 'application/json'}
 
     response = httpx.put(url, headers=headers, params=params)
+    # print(response)
 
     print(f"Document: {document_id}, Uploaded succefully")
