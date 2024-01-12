@@ -251,8 +251,6 @@ const useApi = () => {
         }
       });
 
-      // console.log(response);
-
       return response.data.suggestions;
     } catch (err) {
       if (err.response.status === 403) navigate('/login');
