@@ -59,10 +59,12 @@ const ChatBox = () => {
 
   const checkDocumentStatus = async () => {
     try {
-      const status = await getDocumentStatus(documentId);
+      if (documentId) {
+        const status = await getDocumentStatus(documentId);
 
-      if (status === true) {
-        setIsDocumentLoading(false);
+        if (status === true) {
+          setIsDocumentLoading(false);
+        }
       }
     } catch (error) {
       console.error('Error checking document status:', error);

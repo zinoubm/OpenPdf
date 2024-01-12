@@ -263,10 +263,12 @@ async def query(
         query_vector=query_vector,
         user_id=current_user.id,
         document_id=document_id,
-        limit=5,
+        limit=16,
     )
 
-    context = "\n\n\n".join([point.payload["chunk"] for point in points])
+    # context = "\n\n\n".join([point.payload["chunk"] for point in points])
+    context = "\n\n\n".join([f"page: {point.payload.get('page', 'not provided')}, text: {point.payload['chunk']}" for point in points])
+
 
     answer = ask(
         context,
@@ -331,10 +333,11 @@ async def query_stream(
         query_vector=query_vector,
         user_id=current_user.id,
         document_id=document_id,
-        limit=5,
+        limit=24,
     )
 
-    context = "\n\n\n".join([point.payload["chunk"] for point in points])
+    context = "\n\n\n".join([f"page: {point.payload.get('page', 'not provided')}, text: {point.payload['chunk']}" for point in points])
+
 
     return StreamingResponse(
         ask_stream(

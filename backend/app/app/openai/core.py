@@ -16,8 +16,7 @@ def ask(context, question, manager):
 
 def ask_stream(context, question, messages, manager):
     prompt = f"""
-    Answer the following question according to the provided context. If the context doesn't contain the answer, Do Not Answer!
-    If the context Is empty, Please Say "The document provided doesn't contain the answer you're seeking for your question. Please consider rephrasing it or trying another approach."!
+    Answer the following question according to the provided document. Reference the number of pages you used for answering.
 
     The answer has to be formated using the markdown format!
 
