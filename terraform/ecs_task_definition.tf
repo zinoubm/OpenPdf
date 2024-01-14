@@ -180,7 +180,7 @@ resource "aws_ecs_task_definition" "default" {
                     },
                     {
                       name  = "DOCUMENT_PORECESSOR_SECRETE_KEY"
-                      value = var.CRON_JOB_SECRET_KEY
+                      value = var.DOCUMENT_PORECESSOR_SECRETE_KEY
                     },
                     # batch
                     {

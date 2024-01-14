@@ -203,7 +203,7 @@ resource "aws_batch_job_definition" "batch" {
                   },
                   {
                     name  = "DOCUMENT_PORECESSOR_SECRETE_KEY"
-                    value = var.CRON_JOB_SECRET_KEY
+                    value = var.DOCUMENT_PORECESSOR_SECRETE_KEY
                   },
 
     ]
