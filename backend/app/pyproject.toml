@@ -37,7 +37,7 @@ qdrant-client = "^1.4.0"
 streaming-form-data = "^1.13.0"
 boto3 = "^1.28.63"
 stripe = "^7.6.0"
-"pdfminer.six" = "^20231228"
+pypdf = "^3.17.4"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.971"

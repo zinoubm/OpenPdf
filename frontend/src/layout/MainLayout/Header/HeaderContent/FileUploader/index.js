@@ -10,7 +10,7 @@ import { useDispatch } from 'react-redux';
 import { activeDocumentId, activeDocumentName, updateRefresKey, activeSelectedKeys } from 'store/reducers/app';
 
 function FileUploader() {
-  const { uploadDocumentStream, uploadDocument } = useApi();
+  const { uploadDocumentStream } = useApi();
   const dispatch = useDispatch();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -19,29 +19,26 @@ function FileUploader() {
     setIsLoading(true);
     try {
       let response;
-      if (process.env.REACT_APP_ENVIRONMENT === 'prod') {
-        response = await uploadDocumentStream(target.files[0]);
-      } else {
-        response = await uploadDocument(target.files[0]);
-      }
+
+      response = await uploadDocumentStream(target.files[0]);
 
       dispatch(activeDocumentId({ documentId: response.data.document_id }));
       dispatch(activeDocumentName({ documentName: response.data.document_title }));
       dispatch(activeSelectedKeys({ selectedKeys: null }));
       dispatch(updateRefresKey());
     } catch (error) {
-      // console.error('Error occurred during upload:', error);
-      if (error.status === 402) {
-        notification.config({
-          duration: 10
-        });
+      console.error('Error occurred during upload:', error);
+      // if (error.status === 402) {
+      //   notification.config({
+      //     duration: 10
+      //   });
 
-        notification.info({
-          message: `Plan Limits Reached.`,
-          description: 'You reached your subscription limits, Please Upgrade to get more quotas.',
-          placement: 'bottomRight'
-        });
-      }
+      //   notification.info({
+      //     message: `Plan Limits Reached.`,
+      //     description: 'You reached your subscription limits, Please Upgrade to get more quotas.',
+      //     placement: 'bottomRight'
+      //   });
+      // }
     } finally {
       setIsLoading(false);
     }

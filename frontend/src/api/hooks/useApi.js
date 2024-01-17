@@ -106,17 +106,17 @@ const useApi = () => {
       return successHandler(response, { notifyOnSuccess: true });
     } catch (err) {
       if (err.response.status === 403) navigate('/login');
-      if (err.status === 402) {
+      if (err.response.status === 402) {
         notification.config({
           duration: 10
         });
         notification.info({
-          message: `Plan Limits Reached.`,
-          description: 'You reached your subscription limits, Please Upgrade to get more quotas.',
+          message: `Upload Limits Reached.`,
+          description: 'You reached your subscription Uploads limits, Please Upgrade to get more quotas.',
           placement: 'bottomRight'
         });
       }
-      return errorHandler(err);
+      return null;
     }
   };
 

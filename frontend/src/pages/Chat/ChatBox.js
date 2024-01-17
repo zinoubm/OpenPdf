@@ -57,6 +57,7 @@ const ChatBox = () => {
     dispatch(updateInputValue({ inputValue: e.target.value }));
   };
 
+  let intervalId;
   const checkDocumentStatus = async () => {
     try {
       if (documentId) {
@@ -64,6 +65,7 @@ const ChatBox = () => {
 
         if (status === true) {
           setIsDocumentLoading(false);
+          clearInterval(intervalId);
         }
       }
     } catch (error) {
@@ -75,10 +77,8 @@ const ChatBox = () => {
     if (documentId) {
       setIsDocumentLoading(true);
     }
-    const intervalId = setInterval(checkDocumentStatus, 5000);
 
-    // Cleanup the interval when the component unmounts
-    return () => clearInterval(intervalId);
+    intervalId = setInterval(checkDocumentStatus, 1000);
   }, [documentId]);
 
   // useEffect(() => {

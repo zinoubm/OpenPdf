@@ -89,7 +89,7 @@ class OpenAiManager:
         except Exception as err:
             logging.error(f"Sorry, There was a problem \n\n {err}")
 
-    def get_chat_completion_stream_with_messages(self, messages, model="gpt-3.5-turbo"):
+    def get_chat_completion_stream_with_messages(self, messages, model="gpt-3.5-turbo-1106"):
         try:
             for chunk in openai.ChatCompletion.create(
                 model=model,

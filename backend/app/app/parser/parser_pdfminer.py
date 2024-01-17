@@ -1,27 +1,44 @@
-import os
-from pypdf import PdfReader
+from pdfminer.layout import LAParams, LTTextBox
+from pdfminer.pdfpage import PDFPage
+from pdfminer.pdfinterp import PDFResourceManager
+from pdfminer.pdfinterp import PDFPageInterpreter
+from pdfminer.converter import PDFPageAggregator
+from pdfminer.pdfparser import PDFParser
+from pdfminer.pdfdocument import PDFDocument
+from pdfminer.pdfinterp import resolve1
 
 from app.openai.base import openai_manager
 from app.vectorstore.qdrant import qdrant_manager
 from uuid import uuid4
-
+import os
 
 
 def get_document_from_file_stream(file_path):
-    reader = PdfReader(file_path)
+    fp = open(file_path, 'rb')
+    rsrcmgr = PDFResourceManager()
+    laparams = LAParams()
+    device = PDFPageAggregator(rsrcmgr, laparams=laparams)
+    interpreter = PDFPageInterpreter(rsrcmgr, device)
+    pages = PDFPage.get_pages(fp, check_extractable=False)
 
-    for page_num, page in enumerate(reader.pages, start=1):
-        page_text = page.extract_text()
+    for page_num, page in enumerate(pages, start=1):
+        interpreter.process_page(page)
+        layout = device.get_result()
 
-        if page_text == '':
-            continue
+        for paragraph in layout:
+            if isinstance(paragraph, LTTextBox):
+                b0, b1, b2, b3, text = paragraph.bbox[0], paragraph.bbox[1], paragraph.bbox[2], paragraph.bbox[3], paragraph.get_text()
 
-        yield {
-                "page":page_num,
-                "text":page_text.strip(),
-                "version":1
-              }
-        
+                yield {
+                        "page":page_num,
+                        "text":text.strip(),
+                        "version":1,
+                        "b0":b0,
+                        "b1":b1,
+                        "b2":b2,
+                        "b3":b3
+                      }
+                
 def upload_batch(batch, user_id, document_id):
     ids = [uuid4().hex for batch_chunk in batch]
     payloads = [
@@ -59,13 +76,15 @@ def process_document(user_id: int, document_id: int, document_path: str) -> str:
     os.remove(document_path)
     return f"processing document {document_id}, with path {document_path} for user {user_id}"
 
-
 def get_number_of_pages(file_path):
     try:
         with open(file_path, 'rb') as f:
-            pdfReader = PdfReader(f)
-            pages_count = len(pdfReader.pages)
-
+            parser = PDFParser(f)
+            doc = PDFDocument(parser)
+            parser.set_document(doc)
+            pages = resolve1(doc.catalog['Pages'])
+            pages_count = pages.get('Count', 0)
+            
         return pages_count
     except Exception as e:
         print(e)
