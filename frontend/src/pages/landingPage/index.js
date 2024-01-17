@@ -38,7 +38,7 @@ function LandingPage() {
             <br />
             Read 64% Faster!
           </Typography>
-          <Typography className="hero-typography-description">No Time? Get your answers in 1 click! </Typography>
+          <Typography className="hero-typography-description">No Time? Get your answers in one click! </Typography>
           <Button href="/login" className="hero-cta-button" size="large">
             Get Started For Free
           </Button>
