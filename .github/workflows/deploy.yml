@@ -3,7 +3,7 @@ name: build
 on:
   push:
     branches:
-      - "celery"
+      - "main"
 
 jobs:
   push_to_docker_hub:
