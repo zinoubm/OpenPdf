@@ -87,7 +87,7 @@ function LandingPage() {
         <div className="feature-card">
           <div className="feature-card-typography">
             <Typography style={{ fontSize: '2.4em', fontFamily: 'DM Serif Display, serif', textAlign: 'center' }}>
-              Uplaod Your PDF,
+              Upload Your PDF,
             </Typography>
             <Typography className="feature-card-typography-description">
               Click the upload button from your OpenPDFaI dashboard and choose a PDF document and hit Enter.
@@ -104,7 +104,7 @@ function LandingPage() {
               Start Chatting!
             </Typography>
             <Typography className="feature-card-typography-description">
-              Select a document form the left hand side menu and enter your question and send It!{' '}
+              Select a document from the left hand side menu and enter your question and send It!{' '}
             </Typography>
           </div>
           <div className="center">
