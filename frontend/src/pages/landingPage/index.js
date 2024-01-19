@@ -23,7 +23,7 @@ function LandingPage() {
           <img className="hero-logo" src={Logo} alt="OpenPdf" />
         </div>
         <div className="hero-header-buttons-container">
-          <Button className="hero-about-button" size="large" type="text" href="#">
+          <Button className="hero-about-button" size="large" type="text" href="https://www.linkedin.com/showcase/openpdfai/">
             About
           </Button>
           <Button className="hero-cta-button" size="large" href="/login">
