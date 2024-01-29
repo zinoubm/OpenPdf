@@ -1,8 +1,0 @@
-.menu-item {
-  color: white;
-  transition: color 0.3s;
-}
-
-.menu-item:hover {
-  color: #5bacfc !important;
-}
