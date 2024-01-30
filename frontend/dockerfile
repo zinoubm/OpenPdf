@@ -2,7 +2,7 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-EXPOSE 5173
+EXPOSE 8000
 
 
 COPY public/ /app/public
