@@ -1,7 +1,7 @@
 from datetime import timedelta
 from typing import Any
 
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
@@ -25,8 +25,10 @@ from google.auth.transport import requests
 router = APIRouter()
 
 
-@router.post("/login/access-token", response_model=schemas.Token)
-def login_access_token(
+@router.post("/login/access-token", 
+            #  response_model=schemas.Token,
+            )
+def login_access_token(response: Response,
     db: Session = Depends(deps.get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ) -> Any:
     """
@@ -51,11 +53,18 @@ def login_access_token(
         )
         raise HTTPException(status_code=401, detail="Unverified user")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    token = security.create_access_token(
+            user.id, expires_delta=access_token_expires
+        )
+    
+    response.set_cookie(key='token', value=f"Bearer {token}", httponly=True)
+
     return {
         "access_token": security.create_access_token(
             user.id, expires_delta=access_token_expires
         ),
         "token_type": "bearer",
+        "user":user
     }
 
 
