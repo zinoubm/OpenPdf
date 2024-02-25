@@ -10,10 +10,10 @@ import { useTheme } from '@mui/material/styles';
 import { Box, ButtonBase, CardContent, ClickAwayListener, Grid, Paper, Popper, Stack, Typography } from '@mui/material';
 
 import MainCard from 'components/MainCard';
-import { Button, Progress, Badge } from 'antd';
+import { Button, Progress, Badge, Input, Space } from 'antd';
 
 import Transitions from 'components/@extended/Transitions';
-import { LogoutOutlined } from '@ant-design/icons';
+import { LogoutOutlined, ArrowRightOutlined } from '@ant-design/icons';
 
 const computeUsagePercentage = (usage, limit) => {
   return (parseInt(usage) / parseInt(limit)) * 100;
@@ -204,6 +204,13 @@ const Profile = () => {
                           )}
                         </Grid>
                         <Grid item>
+                          <Space.Compact style={{ width: '100%', margin: '12px 0' }}>
+                            <Input placeholder="xxxx-xxxx-xxxx-xxxx" />
+                            <Button type="primary">
+                              <ArrowRightOutlined />
+                            </Button>
+                          </Space.Compact>
+
                           <Button icon={<LogoutOutlined />} onClick={handleLogout}>
                             Logout
                           </Button>

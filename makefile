@@ -21,11 +21,14 @@ db_connect:
 migrate:
 	sudo docker exec -it openpdf-backend-1 alembic upgrade head
 
+downgrade_migration:
+	sudo docker exec -it openpdf-backend-1 alembic downgrade -1
+
 generate_migration:
 	sudo docker exec -it openpdf-backend-1 alembic revision --autogenerate -m ${message}
 
 test:
-	sudo docker-compose exec backend bash /app/tests-start.sh -x
+	sudo docker compose exec backend bash /app/tests-start.sh -x
 
 deploy:
 	./terraform/deploy.sh

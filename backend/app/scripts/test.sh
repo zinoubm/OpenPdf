@@ -3,4 +3,4 @@
 set -e
 set -x
 
-pytest --cov=app --cov-report=term-missing app/tests/crud/test_user.py "${@}"
+pytest --cov=app --cov-report=term-missing app/tests/crud/test_lifetime_code.py "${@}"

@@ -333,7 +333,7 @@ async def query_stream(
         query_vector=query_vector,
         user_id=current_user.id,
         document_id=document_id,
-        limit=16,
+        limit=5,
     )
 
     context = "\n\n\n".join([f"page: {point.payload.get('page', 'not provided')}, text: {point.payload['chunk']}" for point in points])

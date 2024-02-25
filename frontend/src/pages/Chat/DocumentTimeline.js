@@ -22,7 +22,7 @@ export const DocumentTimeline = () => {
             children: 'Click the bulb to get suggestions'
           },
           {
-            children: 'Start chating'
+            children: 'Start chatting'
           }
         ]}
       />

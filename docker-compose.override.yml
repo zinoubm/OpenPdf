@@ -17,3 +17,7 @@ services:
         INSTALL_JUPYTER: ${INSTALL_JUPYTER-true}
     # command: bash -c "while true; do sleep 1; done"  # Infinite loop to keep container live doing nothing
     # command: /start-reload.sh
+
+  # db:
+  #   ports:
+  #     - "5432:5432"

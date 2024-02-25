@@ -20,4 +20,6 @@ class User(Base):
     is_superuser: bool = Column(Boolean(), default=False)
     documents: Mapped["Document"] = relationship("Document", back_populates="user")
     uploads_counter = Column(Integer, default=0, nullable=False)
-    queries_counter = Column(Integer, default=0, nullable=False) 
+    queries_counter = Column(Integer, default=0, nullable=False)
+    lifetime_uploads_counter = Column(Integer, default=0)
+    lifetime_queries_counter = Column(Integer, default=0)
