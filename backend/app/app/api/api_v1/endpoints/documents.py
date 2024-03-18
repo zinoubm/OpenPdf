@@ -26,12 +26,15 @@ from streaming_form_data.validators import MaxSizeValidator
 from app.aws.batch import aws_batch_manager
 from app.aws.s3 import aws_s3_manager
 
+from app.utils import limiter
+
 # import boto3
 from botocore.exceptions import ClientError
 
 from .exeptions import MaxBodySizeValidator
 
 router = APIRouter()
+
 
 # actually remove this and use documents less than 30 pages in development
 # used for local dev
@@ -53,9 +56,9 @@ async def upsert_file(
         raise HTTPException(
             status_code=415, detail="Openpdf Does Not Support Other Formats Yet!"
         )
-    
+
     filename = file.filename
-    temp_file_path="/tmp/temp_file"
+    temp_file_path = "/tmp/temp_file"
     stream = await file.read()
     with open(temp_file_path, "wb") as file:
         file.write(stream)
@@ -64,10 +67,12 @@ async def upsert_file(
     document = crud.document.create_with_user(
         db=db, obj_in=document_in, user_id=current_user.id
     )
-        
+
     aws_s3_manager.upload_s3_object(file_path=temp_file_path, document_id=document.id)
 
-    process_document(user_id=current_user.id, document_id=document.id, document_path=temp_file_path)
+    process_document(
+        user_id=current_user.id, document_id=document.id, document_path=temp_file_path
+    )
 
     # set processed true
     updated_document_in = schemas.DocumentUpdate(is_processed=True)
@@ -83,25 +88,27 @@ async def upsert_stream(
     current_user: models.User = Depends(deps.get_current_active_user),
 ):
     # limiter
-    user_plan, plan_status = get_user_plan(db=db, user_id=current_user.id)
-    if plan_status != "ACTIVE":
-        raise HTTPException(
-            status_code=402,
-            detail=f"Your plan ({user_plan}) Is non active!",
-        )
+    # user_plan, plan_status = get_user_plan(db=db, user_id=current_user.id)
+    # if plan_status != "ACTIVE":
+    #     raise HTTPException(
+    #         status_code=402,
+    #         detail=f"Your plan ({user_plan}) Is non active!",
+    #     )
 
-    user_limits = get_user_limits(user_plan)
-    usage = crud.user.get_usage(db=db, user_id=current_user.id)
+    # user_limits = get_user_limits(user_plan)
+    # usage = crud.user.get_usage(db=db, user_id=current_user.id)
 
-    if usage[FEATURES_ENUM.UPLOADS] + 1 > user_limits[FEATURES_ENUM.UPLOADS]:
-        raise HTTPException(
-            status_code=402,
-            detail=f"Max {FEATURES_ENUM.UPLOADS} limit exeeded for the {user_plan} plan!",
-        )
+    # if usage[FEATURES_ENUM.UPLOADS] + 1 > user_limits[FEATURES_ENUM.UPLOADS]:
+    #     raise HTTPException(
+    #         status_code=402,
+    #         detail=f"Max {FEATURES_ENUM.UPLOADS} limit exeeded for the {user_plan} plan!",
+    #     )
 
-    crud.user.increment_usage(
-        db=db, user_id=current_user.id, feature=FEATURES_ENUM.UPLOADS
-    )
+    # crud.user.increment_usage(
+    #     db=db, user_id=current_user.id, feature=FEATURES_ENUM.UPLOADS
+    # )
+
+    limiter(db=db, user_id=current_user.id, feature=FEATURES_ENUM.UPLOADS)
 
     # upload
     MAX_REQUEST_BODY_SIZE = settings.MAX_REQUEST_BODY_SIZE
@@ -120,13 +127,13 @@ async def upsert_stream(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Filename header is missing",
         )
-    
+
     mimetype, _ = mimetypes.guess_type(filename)
     if mimetype != "application/pdf":
         raise HTTPException(
             status_code=415, detail="OpenPdfAI Does Not Support Other Formats Yet!"
         )
-    
+
     try:
         temp_file_path = os.path.join("/tmp", os.path.basename(filename))
         file_ = FileTarget(temp_file_path, validator=MaxSizeValidator(MAX_FILE_SIZE))
@@ -144,23 +151,28 @@ async def upsert_stream(
             db=db, obj_in=document_in, user_id=current_user.id
         )
 
-        aws_s3_manager.upload_s3_object(file_path=temp_file_path, document_id=document.id)
+        aws_s3_manager.upload_s3_object(
+            file_path=temp_file_path, document_id=document.id
+        )
 
         pages_number = get_number_of_pages(temp_file_path)
-        
+
         if pages_number <= 30:
-            process_document(user_id=current_user.id, document_id=document.id, document_path=temp_file_path)
+            process_document(
+                user_id=current_user.id,
+                document_id=document.id,
+                document_path=temp_file_path,
+            )
 
             # set processed true
             updated_document_in = schemas.DocumentUpdate(is_processed=True)
             crud.document.update(db=db, db_obj=document, obj_in=updated_document_in)
 
-        elif settings.ENVIRONMENT == 'prod':
-            response = aws_batch_manager.run({
-                "user_id":str(current_user.id),
-                "document_id":str(document.id)
-            })
-        
+        elif settings.ENVIRONMENT == "prod":
+            response = aws_batch_manager.run(
+                {"user_id": str(current_user.id), "document_id": str(document.id)}
+            )
+
     except Exception as e:
         crud.document.remove(db=db, id=document.id)
         aws_s3_manager.delete_s3_object(document_id=document.id)
@@ -169,9 +181,10 @@ async def upsert_stream(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="There was an error uploading the file",
         )
-    
+
     return {"document_id": document.id, "document_title": file_.multipart_filename}
-    
+
+
 @router.get("/", response_model=List[schemas.Document])
 def read_documents(
     db: Session = Depends(deps.get_db),
@@ -188,6 +201,7 @@ def read_documents(
 
     return documents
 
+
 @router.get("/status")
 def get_document_status(
     document_id: int,
@@ -201,7 +215,8 @@ def get_document_status(
     if document.user_id != current_user.id:
         raise HTTPException(status_code=400, detail="Not enough permissions")
 
-    return {"status" : document.is_processed}
+    return {"status": document.is_processed}
+
 
 @router.put("/status")
 def set_document_status(
@@ -267,8 +282,12 @@ async def query(
     )
 
     # context = "\n\n\n".join([point.payload["chunk"] for point in points])
-    context = "\n\n\n".join([f"page: {point.payload.get('page', 'not provided')}, text: {point.payload['chunk']}" for point in points])
-
+    context = "\n\n\n".join(
+        [
+            f"page: {point.payload.get('page', 'not provided')}, text: {point.payload['chunk']}"
+            for point in points
+        ]
+    )
 
     answer = ask(
         context,
@@ -299,25 +318,27 @@ async def query_stream(
         )
 
     # limiter will be a function
-    user_plan, plan_status = get_user_plan(db=db, user_id=current_user.id)
-    if plan_status != "ACTIVE":
-        raise HTTPException(
-            status_code=402,
-            detail=f"Your plan ({user_plan}) Is non active!",
-        )
+    # user_plan, plan_status = get_user_plan(db=db, user_id=current_user.id)
+    # if plan_status != "ACTIVE":
+    #     raise HTTPException(
+    #         status_code=402,
+    #         detail=f"Your plan ({user_plan}) Is non active!",
+    #     )
 
-    user_limits = get_user_limits(user_plan)
-    usage = crud.user.get_usage(db=db, user_id=current_user.id)
+    # user_limits = get_user_limits(user_plan)
+    # usage = crud.user.get_usage(db=db, user_id=current_user.id)
 
-    if usage[FEATURES_ENUM.QUERIES] + 1 > user_limits[FEATURES_ENUM.QUERIES]:
-        raise HTTPException(
-            status_code=402,
-            detail=f"Max {FEATURES_ENUM.UPLOADS} limit exeeded for the {user_plan} plan!",
-        )
+    # if usage[FEATURES_ENUM.QUERIES] + 1 > user_limits[FEATURES_ENUM.QUERIES]:
+    #     raise HTTPException(
+    #         status_code=402,
+    #         detail=f"Max {FEATURES_ENUM.UPLOADS} limit exeeded for the {user_plan} plan!",
+    #     )
 
-    crud.user.increment_usage(
-        db=db, user_id=current_user.id, feature=FEATURES_ENUM.QUERIES
-    )
+    # crud.user.increment_usage(
+    #     db=db, user_id=current_user.id, feature=FEATURES_ENUM.QUERIES
+    # )
+
+    limiter(db=db, user_id=current_user.id, feature=FEATURES_ENUM.QUERIES)
 
     # Qurey
     document = crud.document.get(db=db, id=document_id)
@@ -336,8 +357,12 @@ async def query_stream(
         limit=5,
     )
 
-    context = "\n\n\n".join([f"page: {point.payload.get('page', 'not provided')}, text: {point.payload['chunk']}" for point in points])
-
+    context = "\n\n\n".join(
+        [
+            f"page: {point.payload.get('page', 'not provided')}, text: {point.payload['chunk']}"
+            for point in points
+        ]
+    )
 
     return StreamingResponse(
         ask_stream(
@@ -348,6 +373,7 @@ async def query_stream(
         ),
         media_type="text/event-stream",
     )
+
 
 @router.get("/question-suggestions")
 async def suggest_question(
@@ -376,11 +402,11 @@ async def suggest_question(
     suggestions = suggest_questions(context, manager=openai_manager)
 
     try:
-        suggestions_list = [suggestion.strip() for suggestion in suggestions.split('\n')]
+        suggestions_list = [
+            suggestion.strip() for suggestion in suggestions.split("\n")
+        ]
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail="Couldn't parse suggestions!"
-        )
+        raise HTTPException(status_code=500, detail="Couldn't parse suggestions!")
 
     return {"suggestions": suggestions_list}
 
@@ -396,12 +422,12 @@ def delete_document(
 
     if not document:
         raise HTTPException(status_code=404, detail="Document not found")
-    
+
     if not crud.user.is_superuser(current_user) and (
         document.user_id != current_user.id
     ):
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    
+
     try:
         qdrant_manager.delete_points(user_id=current_user.id, document_id=id)
         aws_s3_manager.delete_s3_object(document_id=document.id)

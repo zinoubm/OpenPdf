@@ -41,7 +41,7 @@ const Profile = () => {
   const dispatch = useDispatch();
 
   const { deleteToken } = useAuth();
-  const { currentUser } = useApi();
+  const { currentUser, redeemCode } = useApi();
 
   const handleLogout = async () => {
     deleteToken();
@@ -62,6 +62,14 @@ const Profile = () => {
 
   const getInitials = (fullName) => {
     return fullName[0].toUpperCase();
+  };
+
+  const codeInput = useRef();
+
+  const handleRedeemCode = async () => {
+    // console.log(codeInput.current.input.value);
+    const response = await redeemCode(codeInput.current.input.value);
+    console.log(response);
   };
 
   useEffect(() => {
@@ -183,7 +191,7 @@ const Profile = () => {
                                 ></Badge>
                               </div>
 
-                              <Typography variant="h6">Usage</Typography>
+                              <Typography variant="h6">Monthly usage</Typography>
                               <Typography variant="body2" color="textSecondary">
                                 Uploads: {paymentSummary.usage.UPLOADS}/{paymentSummary.user_limits.UPLOADS}
                               </Typography>
@@ -200,13 +208,21 @@ const Profile = () => {
                                 showInfo={false}
                                 size={[240, 10]}
                               />
+                              <Typography variant="h6">Remaining lifetime resources</Typography>
+                              <Typography variant="body2" color="textSecondary">
+                                Uploads: {paymentSummary.lifetime_track.UPLOADS}
+                              </Typography>
+                              <Typography variant="body2" color="textSecondary">
+                                Questions: {paymentSummary.lifetime_track.QUERIES}
+                              </Typography>
                             </div>
                           )}
                         </Grid>
                         <Grid item>
+                          <Typography variant="h6">Redeem code</Typography>
                           <Space.Compact style={{ width: '100%', margin: '12px 0' }}>
-                            <Input placeholder="xxxx-xxxx-xxxx-xxxx" />
-                            <Button type="primary">
+                            <Input placeholder="xxxx-xxxx-xxxx-xxxx" ref={codeInput} />
+                            <Button type="primary" onClick={handleRedeemCode}>
                               <ArrowRightOutlined />
                             </Button>
                           </Space.Compact>

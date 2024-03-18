@@ -1,9 +1,20 @@
 from typing import Any, Dict, Optional
 from datetime import datetime, timedelta
 from pathlib import Path
+from app import crud
+from fastapi import HTTPException
+from app.stripe.limiter import get_user_plan, get_user_limits
+from app.core.constants import (
+    FEATURES_ENUM,
+    LIFETIME_LOAD_AMOUNTS,
+    PLANS_ENUM,
+    FEATURES_LIMITS_MATRIX,
+)
 import logging
 
 from app.core.config import settings
+from sqlalchemy.orm import Session
+
 
 from email.message import EmailMessage
 from passlib import pwd
@@ -191,3 +202,42 @@ def verify_email_verification_token(token: str) -> Optional[str]:
 
 def generate_password():
     return pwd.genword()
+
+
+def limiter(
+    db: Session,
+    user_id: int,
+    feature: str,
+):
+    # there's 2 types of quotas, monthly and lifetime.
+    # first the limiter will check if they have remaining montly quotas
+    # if yes increment usage and continue
+    # if no
+    # limiter will check if they have remaining lifetime quotas
+    # if yes decrement track and continue
+    # if no raise 402 error
+
+    user_plan, plan_status = get_user_plan(db=db, user_id=user_id)
+    if plan_status != "ACTIVE":
+        raise HTTPException(
+            status_code=402,
+            detail=f"Your plan ({user_plan}) Is non active!",
+        )
+
+    user_limits = get_user_limits(user_plan)
+    usage = crud.user.get_usage(db=db, user_id=user_id)
+
+    if usage[feature] + 1 <= user_limits[feature]:
+        crud.user.increment_usage(db=db, user_id=user_id, feature=feature)
+        return
+
+    track = crud.user.get_lifetime_track(db=db, user_id=user_id)
+
+    if track[feature] > 0:
+        crud.user.decrement_lifetime_track(db=db, user_id=user_id, feature=feature)
+        return
+
+    raise HTTPException(
+        status_code=402,
+        detail=f"Max {feature} limit exeeded for the {user_plan} plan!",
+    )

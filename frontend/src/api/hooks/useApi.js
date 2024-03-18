@@ -270,12 +270,50 @@ const useApi = () => {
         }
       });
 
-      console.log(response);
-
       return response.data.status;
     } catch (err) {
       if (err.response.status === 403) navigate('/login');
       return errorHandler(err);
+    }
+  };
+
+  const redeemCode = async (code) => {
+    try {
+      const response = await axios.post('/users/code', '', {
+        params: {
+          code: code
+        },
+        headers: {
+          accept: 'application/json',
+          Authorization: 'Bearer ' + getToken(),
+          'content-type': 'application/x-www-form-urlencoded'
+        }
+      });
+
+      return successHandler(response, { notifyOnSuccess: true });
+    } catch (err) {
+      if (err.response.status === 403) navigate('/login');
+      if (err.response.status === 422) {
+        notification.config({
+          duration: 10
+        });
+        notification.error({
+          message: `Invalid Code.`,
+          description: 'This code is not valid, please enter a valid one.',
+          placement: 'bottomRight'
+        });
+      }
+      if (err.response.status === 409) {
+        notification.config({
+          duration: 10
+        });
+        notification.error({
+          message: `Code already used.`,
+          description: 'This code is already used, please purchase more or use a fresh one.',
+          placement: 'bottomRight'
+        });
+      }
+      // return errorHandler(err);
     }
   };
 
@@ -290,7 +328,8 @@ const useApi = () => {
     queryDocument,
     getQuestionSuggestions,
     deleteDocument,
-    getDocumentStatus
+    getDocumentStatus,
+    redeemCode
   };
 };
 

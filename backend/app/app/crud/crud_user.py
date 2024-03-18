@@ -7,7 +7,7 @@ from app.crud.base import CRUDBase
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
 
-from app.core.constants import FEATURES_ENUM
+from app.core.constants import FEATURES_ENUM, LIFETIME_LOAD_AMOUNTS
 
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
@@ -102,6 +102,42 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         db.commit()
 
         return True
+    
+    def get_lifetime_track(self, db: Session, user_id):
+        user = self.get(db=db, id=user_id)
+        return {
+            FEATURES_ENUM.UPLOADS: user.lifetime_uploads_counter,
+            FEATURES_ENUM.QUERIES: user.lifetime_queries_counter,
+        }
 
+    def load_lifetime_track(self, db: Session, user_id):
+        user = self.get(db=db, id=user_id)
+        current_lifetime_uploads_counter = user.lifetime_uploads_counter
+        current_lifetime_queries_counter = user.lifetime_queries_counter
+        user.lifetime_uploads_counter = current_lifetime_uploads_counter + LIFETIME_LOAD_AMOUNTS[FEATURES_ENUM.UPLOADS]
+        user.lifetime_queries_counter = current_lifetime_queries_counter + LIFETIME_LOAD_AMOUNTS[FEATURES_ENUM.QUERIES]
+        db.add(user)
+        db.commit()
+
+        return user
+
+    def decrement_lifetime_track(self, db: Session, user_id, feature, amount=1):
+        user = self.get(db=db, id=user_id)
+
+        if feature == FEATURES_ENUM.UPLOADS:
+            user.lifetime_uploads_counter -= amount
+            db.add(user)
+            db.commit()
+
+            return user
+
+        if feature == FEATURES_ENUM.QUERIES:
+            user.lifetime_queries_counter -= amount
+            db.add(user)
+            db.commit()
+
+            return user
+
+        raise Exception("Non valid feature")
 
 user = CRUDUser(User)

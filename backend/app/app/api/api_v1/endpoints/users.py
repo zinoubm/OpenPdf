@@ -228,3 +228,22 @@ def update_user(
         )
     user = crud.user.update(db, db_obj=user, obj_in=user_in)
     return user
+
+@router.post("/code")
+def redeem_code(
+    code: str,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    is_used_code = crud.lifetime_code.check_code(db=db, code=code)
+    if is_used_code is None:
+        raise HTTPException(status_code=422, detail="Non valid code")
+
+    if is_used_code:
+        raise HTTPException(status_code=409, detail="Code already used")
+    
+
+    crud.user.load_lifetime_track(db=db, user_id=current_user.id)
+    crud.lifetime_code.redeem_code(db=db, code=code)
+
+    return {"detail":"Code redumption was succesful"}

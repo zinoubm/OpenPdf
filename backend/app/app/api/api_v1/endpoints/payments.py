@@ -77,12 +77,14 @@ def summary(
     user_plan, plan_status = get_user_plan(db=db, user_id=current_user.id)
     user_limits = get_user_limits(user_plan)
     usage = crud.user.get_usage(db=db, user_id=current_user.id)
+    track = crud.user.get_lifetime_track(db=db, user_id=current_user.id)
 
     return {
         "plan": user_plan,
         "plan_status": plan_status,
         "user_limits": user_limits,
         "usage": usage,
+        "lifetime_track": track
     }
 
 
