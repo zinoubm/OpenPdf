@@ -81,9 +81,9 @@ const ChatBox = () => {
     intervalId = setInterval(checkDocumentStatus, 1000);
   }, [documentId]);
 
-  // useEffect(() => {
-  //   if (isSuggestionsOpen === false && documentId != null) setIsSuggestionsOpen(true);
-  // }, [documentId]);
+  useEffect(() => {
+    if (isSuggestionsOpen === false && documentId != null) setIsSuggestionsOpen(true);
+  }, [documentId]);
 
   return (
     <Card
