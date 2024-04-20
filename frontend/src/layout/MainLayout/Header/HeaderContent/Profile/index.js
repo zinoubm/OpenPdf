@@ -37,6 +37,7 @@ const Profile = () => {
   const theme = useTheme();
   const { userFullName, userEmail } = useSelector((state) => state.auth);
   const { paymentSummary } = useSelector((state) => state.app);
+  const [lifetimeOptipistic, setLifetimeOptipistic] = useState(0);
 
   const dispatch = useDispatch();
 
@@ -69,6 +70,7 @@ const Profile = () => {
   const handleRedeemCode = async () => {
     // console.log(codeInput.current.input.value);
     const response = await redeemCode(codeInput.current.input.value);
+    setLifetimeOptipistic(lifetimeOptipistic + 1);
     console.log(response);
   };
 
@@ -210,10 +212,10 @@ const Profile = () => {
                               />
                               <Typography variant="h6">Remaining lifetime resources</Typography>
                               <Typography variant="body2" color="textSecondary">
-                                Uploads: {paymentSummary.lifetime_track.UPLOADS}
+                                Uploads: {paymentSummary.lifetime_track.UPLOADS + lifetimeOptipistic * 10}
                               </Typography>
                               <Typography variant="body2" color="textSecondary">
-                                Questions: {paymentSummary.lifetime_track.QUERIES}
+                                Questions: {paymentSummary.lifetime_track.QUERIES + lifetimeOptipistic * 1000}
                               </Typography>
                             </div>
                           )}

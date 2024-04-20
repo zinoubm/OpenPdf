@@ -70,7 +70,7 @@ function LandingPage() {
         </div>
         <div className="typography-section-text">
           <Typography className="typography-section-text-header" style={{ fontFamily: 'DM Serif Display, serif' }}>
-            Revolutionary Chat-Based Summarization!
+            Revolutionary Chat-Based Interaction!
           </Typography>
           <Typography className="typography-section-text-description">
             Our app revolutionizes the way you engage with your PDFs. No longer do you have to navigate lengthy pages or get lost in a sea
