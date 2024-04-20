@@ -34,9 +34,11 @@ function LandingPage() {
       <section className="hero-section section">
         <div className="hero-typography-container">
           <Typography className="hero-typography-header" style={{ fontFamily: 'DM Serif Display, serif' }}>
-            The Simplest AI Pdf Summarizer!
+            Chat with Documents.
+            <br />
+            Read 64% Faster!
           </Typography>
-          <Typography className="hero-typography-description">Read 10x Faster with Pdf summarizer AI</Typography>
+          <Typography className="hero-typography-description">No Time? Get your answers in one click! </Typography>
           <Button href="/login" className="hero-cta-button" size="large">
             Get Started For Free
           </Button>
@@ -99,10 +101,10 @@ function LandingPage() {
         <div className="feature-card">
           <div className="feature-card-typography">
             <Typography style={{ fontSize: '2.4em', fontFamily: 'DM Serif Display, serif', textAlign: 'center' }}>
-              Start Summarizing
+              Start Chatting!
             </Typography>
             <Typography className="feature-card-typography-description">
-              Select a document from the left hand side menu and get your summary!{' '}
+              Select a document from the left hand side menu and enter your question and send It!{' '}
             </Typography>
           </div>
           <div className="center">
